@@ -5,10 +5,14 @@ import javax.swing.*;
 class PropertiesX {
     public Properties props;
     public File file;
+    public HashMap<String, String> defaults;
     
     public PropertiesX(File f) {
         file = f;
         props = new Properties();
+        defaults = new HashMap<String, String>();
+        // Add defaults here
+        defaults.put("E")
 
         try {
             FileInputStream in = new FileInputStream(file.getPath());
@@ -19,10 +23,10 @@ class PropertiesX {
         }
     }
 
-    public String get(String key, String def) {
+    public String get(String key) {
         String got = props.getProperty(key);
         if (got == null) {
-            return def;
+            return defaults.get(key);
         }
         return got;
     }
@@ -45,7 +49,22 @@ class PropertiesX {
     public JMenu createJMenu(String title, String prefix) {
         JMenu menu = new JMenu(title);
         for (Map.Entry<Object, Object> e : props.entrySet()) {
-            System.out.println(e.getKey());
+            String key = (String) e.getKey();
+            String val = (String) e.getValue();
+
+            String[] defs = defaults.get(key).split(",");
+            if (key.startsWith(prefix)) {
+                if (defs.length == 2 && defs[0].equals("Y") && defs[1].equals("N")) {
+                    JCheckBoxMenuItem checkBoxMenuItem = new JCheckBoxMenuItem(key.substring(prefix.length()));
+                    if (val.equals("Y")) {
+                        checkBoxMenuItem.setState(true);
+                    }
+                    menu.add(checkBoxMenuItem);
+                } else {
+                    JMenuItem menuItem = new JMenuItem(key);
+                    menu.add(menuItem);
+                }
+            }
         }
         return menu;
     }

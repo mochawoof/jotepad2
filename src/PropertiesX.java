@@ -15,7 +15,6 @@ class PropertiesX {
         userChoices = new HashMap<String, String>();
         
         setUserChoice("Theme", "System", "System,Metal,Nimbus,CDE/Motif");
-        setUserChoice("Nigga Mode", "Off", "On,Off");
 
         try {
             FileInputStream in = new FileInputStream(file.getPath());

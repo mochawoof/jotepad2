@@ -9,13 +9,18 @@ class Main {
     public static PropertiesX propsX;
     public static JMenuBar menuBar;
     // Menu
+    public static JMenu editMenu;
+
     public static JMenu fileMenu;
+    public static JMenuItem newItem;
+    public static JMenuItem openItem;
+    public static JMenuItem reloadItem;
+    public static JMenuItem closeItem;
 
     public static JMenu viewMenu;
 
-    public static JMenu settingsMenu;
-
     public static JMenu pluginsMenu;
+    public static JMenuItem noneAvailableItem;
 
     public static JMenu helpMenu;
     public static JMenuItem aboutItem;
@@ -47,12 +52,37 @@ class Main {
         // Menu
         fileMenu = new JMenu("File");
         menuBar.add(fileMenu);
+        newItem = new JMenuItem("New");
+        newItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
+        newItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                tabbedPane.addTab("New", new Tab("UTF-8"));
+                tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
+            }
+        });
+        fileMenu.add(newItem);
+        openItem = new JMenuItem("Open");
+        openItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
+        fileMenu.add(openItem);
+        reloadItem = new JMenuItem("Reload");
+        reloadItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
+        fileMenu.add(reloadItem);
+        closeItem = new JMenuItem("Close");
+        closeItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK));
+        fileMenu.add(closeItem);
+
+        editMenu = new JMenu("Edit");
+        //TODO
+        menuBar.add(editMenu);
 
         viewMenu = propsX.createJMenu("View", "View");
         menuBar.add(viewMenu);
 
         pluginsMenu = new JMenu("Plugins");
         menuBar.add(pluginsMenu);
+        noneAvailableItem = new JMenuItem("None Available");
+        noneAvailableItem.setEnabled(false);
+        pluginsMenu.add(noneAvailableItem);
 
         helpMenu = new JMenu("Help");
         menuBar.add(helpMenu);
@@ -69,7 +99,7 @@ class Main {
         tabbedPane = new JTabbedPane();
         f.add(tabbedPane, BorderLayout.CENTER);
 
-        tabbedPane.addTab("New", new Tab());
+        tabbedPane.addTab("New", new Tab("UTF-8"));
 
         f.setVisible(true);
     }

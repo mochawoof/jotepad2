@@ -9,14 +9,13 @@ import org.fife.ui.rsyntaxtextarea.*;
 import java.lang.reflect.*;
 
 class Tab extends JPanel {
-    public JTabbedPane tabbedPane;
     public RSyntaxTextArea textArea;
     public RTextScrollPane scrollPane;
     public File file = null;
     public boolean saved = false;
     public String charset = "UTF-8";
 
-    public Tab(JTabbedPane ancestorTabbedPane) {
+    public Tab() {
         setLayout(new BorderLayout());
         
         textArea = new RSyntaxTextArea(20, 60);
@@ -25,14 +24,13 @@ class Tab extends JPanel {
         scrollPane = new RTextScrollPane(textArea);
         add(scrollPane, BorderLayout.CENTER);
 
-        tabbedPane = ancestorTabbedPane;
-        tabbedPane.addTab("New", this);
-        tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
+        Main.tabbedPane.addTab("New", this);
+        Main.tabbedPane.setSelectedIndex(Main.tabbedPane.getTabCount() - 1);
     }
 
     public int getTabIndex() {
-        for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-            if (SwingUtilities.isDescendingFrom(this, tabbedPane.getComponentAt(i))) {
+        for (int i = 0; i < Main.tabbedPane.getTabCount(); i++) {
+            if (SwingUtilities.isDescendingFrom(this, Main.tabbedPane.getComponentAt(i))) {
                 return i;
             }
         }
@@ -63,10 +61,15 @@ class Tab extends JPanel {
         file = newFile;
         String fileName = file.getName();
         textArea.setSyntaxEditingStyle(getSyntaxConstant(fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length())));
-        tabbedPane.setTitleAt(getTabIndex(), fileName);
+        Main.tabbedPane.setTitleAt(getTabIndex(), fileName + (saved ? "" : " *"));
     }
 
-    public void reload() {
+    public void reload(boolean force) {
+        if (!force && !saved) {
+            if (JOptionPane.showConfirmDialog(Main.f, "Are you sure you want to reload? Your unsaved changes will be lost.", "Confirm", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+                return;
+            }
+        }
         try {
             textArea.setText("");
             if (file != null) {

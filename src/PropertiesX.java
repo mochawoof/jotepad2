@@ -16,6 +16,7 @@ class PropertiesX {
         userChoices = new HashMap<String, String>();
         
         setUserChoice("ViewTheme", "System", "System,Metal,Nimbus,CDE/Motif");
+        props.setProperty("LastOpenDirectory", ".");
 
         try {
             FileInputStream in = new FileInputStream(file.getPath());

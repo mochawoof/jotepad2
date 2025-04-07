@@ -56,16 +56,26 @@ class Main {
         newItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
         newItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new Tab(tabbedPane);
+                new Tab();
             }
         });
         fileMenu.add(newItem);
         openItem = new JMenuItem("Open");
         openItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Tab tab = new Tab(tabbedPane);
-                tab.updateFile(new File("Main.java"));
-                tab.reload();
+                JFileChooser chooser = new JFileChooser();
+                chooser.setCurrentDirectory(new File(propsX.get("LastOpenDirectory")));
+
+                Action detailsAction = chooser.getActionMap().get("viewTypeDetails");
+                if (detailsAction != null) {detailsAction.actionPerformed(null);}
+
+                if (chooser.showOpenDialog(f) == JFileChooser.APPROVE_OPTION) {
+                    propsX.set("LastOpenDirectory", chooser.getSelectedFile().getAbsolutePath());
+
+                    Tab tab = new Tab();
+                    tab.updateFile(chooser.getSelectedFile());
+                    tab.reload(true);
+                }
             }
         });
         openItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
@@ -74,7 +84,7 @@ class Main {
         reloadItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
         reloadItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ((Tab) tabbedPane.getSelectedComponent()).reload();
+                ((Tab) tabbedPane.getSelectedComponent()).reload(false);
             }
         });
         fileMenu.add(reloadItem);
@@ -110,7 +120,7 @@ class Main {
         tabbedPane = new JTabbedPane();
         f.add(tabbedPane, BorderLayout.CENTER);
 
-        new Tab(tabbedPane);
+        new Tab();
 
         f.setVisible(true);
     }

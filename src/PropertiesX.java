@@ -8,6 +8,7 @@ class PropertiesX {
     public Properties props;
     public File file;
     public HashMap<String, String> userChoices;
+    public String outNote = "Jotepad2 properties";
     
     public PropertiesX(File f) {
         file = f;
@@ -46,7 +47,7 @@ class PropertiesX {
     public void save() {
         try {
             FileOutputStream out = new FileOutputStream(file.getPath());
-            props.store(out, "");
+            props.store(out, outNote);
             out.close();
         } catch (Exception e) {
             e.printStackTrace();

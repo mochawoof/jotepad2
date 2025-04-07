@@ -56,16 +56,27 @@ class Main {
         newItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
         newItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                tabbedPane.addTab("New", new Tab("UTF-8"));
-                tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
+                new Tab(tabbedPane);
             }
         });
         fileMenu.add(newItem);
         openItem = new JMenuItem("Open");
+        openItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Tab tab = new Tab(tabbedPane);
+                tab.updateFile(new File("Main.java"));
+                tab.reload();
+            }
+        });
         openItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
         fileMenu.add(openItem);
         reloadItem = new JMenuItem("Reload");
         reloadItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
+        reloadItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                ((Tab) tabbedPane.getSelectedComponent()).reload();
+            }
+        });
         fileMenu.add(reloadItem);
         closeItem = new JMenuItem("Close");
         closeItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK));
@@ -99,7 +110,7 @@ class Main {
         tabbedPane = new JTabbedPane();
         f.add(tabbedPane, BorderLayout.CENTER);
 
-        tabbedPane.addTab("New", new Tab("UTF-8"));
+        new Tab(tabbedPane);
 
         f.setVisible(true);
     }

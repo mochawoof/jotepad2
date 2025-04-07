@@ -2,8 +2,8 @@
 #Wed Mar 26 11:17:16 EDT 2025
 main=Main
 include=*.java
-jarinclude=*.class icon64.png lib\\luaj-jse-3.0.2.jar lib\\rsyntaxtextarea-3.6.0.jar
-cp=lib\\luaj-jse-3.0.2.jar;lib\\rsyntaxtextarea-3.6.0.jar;.
-jdk=C:\\Program Files (x86)\\BlueJ\\jdk\\bin
+jarinclude=*.class icon64.png
+cp=lib/*;.
+jdk=C:\\Windows\\Temp\\chopper\\bluej\\jdk\\bin
 C:\\Windows\\Temp\\chopper\\bluej\\jdk\\bin=
 C:\\Program Files (x86)\\BlueJ\\jdk\\bin=

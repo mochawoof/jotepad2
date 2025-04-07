@@ -14,7 +14,7 @@ class PropertiesX {
         props = new Properties();
         userChoices = new HashMap<String, String>();
         
-        setUserChoice("Theme", "System", "System,Metal,Nimbus,CDE/Motif");
+        setUserChoice("ViewTheme", "System", "System,Metal,Nimbus,CDE/Motif");
 
         try {
             FileInputStream in = new FileInputStream(file.getPath());
@@ -53,7 +53,7 @@ class PropertiesX {
         }
     }
 
-    public JMenu createJMenu(String title) {
+    public JMenu createJMenu(String title, String prefix) {
         JMenu menu = new JMenu(title);
         for (Map.Entry<String, String> e : userChoices.entrySet()) {
             String key = e.getKey();
@@ -61,43 +61,47 @@ class PropertiesX {
 
             String val = get(key);
 
-            if (choices.length == 2 && ((choices[0].equals("Yes") && choices[1].equals("No")) || (choices[0].equals("On") && choices[1].equals("Off")))) {
-                JCheckBoxMenuItem item = new JCheckBoxMenuItem(key);
-                if (val.equals(choices[0])) {
-                    item.setState(true);
-                }
-                item.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        set(key, (item.getState() ? choices[0] : choices[1]));
-                        update();
-                    }
-                });
-                menu.add(item);
-            } else {
-                JMenu subMenu = new JMenu(key);
-                for (String c : choices) {
-                    JCheckBoxMenuItem item = new JCheckBoxMenuItem(c);
-                    if (c.equals(val)) {
+            if (key.startsWith(prefix)) {
+                String keySubbed = key.substring(prefix.length(), key.length());
+
+                if (choices.length == 2 && ((choices[0].equals("Yes") && choices[1].equals("No")) || (choices[0].equals("On") && choices[1].equals("Off")))) {
+                    JCheckBoxMenuItem item = new JCheckBoxMenuItem(keySubbed);
+                    if (val.equals(choices[0])) {
                         item.setState(true);
                     }
                     item.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
-                            set(key, c);
-                            Component[] items = subMenu.getMenuComponents();
-                            for (Component i : items) {
-                                JCheckBoxMenuItem ci = (JCheckBoxMenuItem) i;
-                                if (!ci.getText().equals(c)) {
-                                    ci.setState(false);
-                                } else {
-                                    ci.setState(true);
-                                }
-                            }
+                            set(key, (item.getState() ? choices[0] : choices[1]));
                             update();
                         }
                     });
-                    subMenu.add(item);
+                    menu.add(item);
+                } else {
+                    JMenu subMenu = new JMenu(keySubbed);
+                    for (String c : choices) {
+                        JCheckBoxMenuItem item = new JCheckBoxMenuItem(c);
+                        if (c.equals(val)) {
+                            item.setState(true);
+                        }
+                        item.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent e) {
+                                set(key, c);
+                                Component[] items = subMenu.getMenuComponents();
+                                for (Component i : items) {
+                                    JCheckBoxMenuItem ci = (JCheckBoxMenuItem) i;
+                                    if (!ci.getText().equals(c)) {
+                                        ci.setState(false);
+                                    } else {
+                                        ci.setState(true);
+                                    }
+                                }
+                                update();
+                            }
+                        });
+                        subMenu.add(item);
+                    }
+                    menu.add(subMenu);
                 }
-                menu.add(subMenu);
             }
         }
 

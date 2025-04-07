@@ -8,12 +8,18 @@ class Main {
     public static JFrame f;
     public static PropertiesX propsX;
     public static JMenuBar menuBar;
+    // Menu
     public static JMenu fileMenu;
-    //public static JMenu editMenu;
+
     public static JMenu viewMenu;
+
     public static JMenu settingsMenu;
+
     public static JMenu pluginsMenu;
+
     public static JMenu helpMenu;
+    public static JMenuItem aboutItem;
+    //
     
     public static JTabbedPane tabbedPane;
 
@@ -30,24 +36,35 @@ class Main {
 
         propsX = new PropertiesX(new File("jotepad2.properties")) {
             public void update() {
-                setLaf(get("Theme"));
+                setLaf(get("ViewTheme"));
             }
         };
-        setLaf(propsX.get("Theme"));
+        setLaf(propsX.get("ViewTheme"));
 
         menuBar = new JMenuBar();
         f.setJMenuBar(menuBar);
 
+        // Menu
         fileMenu = new JMenu("File");
         menuBar.add(fileMenu);
-        viewMenu = new JMenu("View");
+
+        viewMenu = propsX.createJMenu("View", "View");
         menuBar.add(viewMenu);
-        settingsMenu = propsX.createJMenu("Settings");
-        menuBar.add(settingsMenu);
+
         pluginsMenu = new JMenu("Plugins");
         menuBar.add(pluginsMenu);
+
         helpMenu = new JMenu("Help");
         menuBar.add(helpMenu);
+        aboutItem = new JMenuItem("About");
+        aboutItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(f, "Jotepad v2.0", "About Jotepad 2", JOptionPane.PLAIN_MESSAGE, new ImageIcon(f.getIconImage()));
+            }
+        });
+        aboutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
+        helpMenu.add(aboutItem);
+        //
 
         tabbedPane = new JTabbedPane();
         f.add(tabbedPane, BorderLayout.CENTER);

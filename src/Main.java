@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.event.*;
 
 import java.io.*;
 
@@ -13,6 +14,8 @@ class Main {
     public static JMenuBar menuBar;
     // Menu
     public static JMenu editMenu;
+    public static JMenu charsetMenu;
+    public static String[] charsets = new String[] {"UTF-8", "US-ASCII", "ISO-8859-1", "UTF-16", "UTF-16BE", "UTF-16LE"};
 
     public static JMenu fileMenu;
     public static JMenuItem newItem;
@@ -123,9 +126,31 @@ class Main {
         fileMenu.remove(0);
         fileMenu.add(saveSessionItemTmp);
 
+        // Edit menu
         editMenu = new JMenu("Edit");
-        //TODO
         menuBar.add(editMenu);
+
+        charsetMenu = new JMenu("Charset");
+        editMenu.add(charsetMenu);
+        for (String charset : charsets) {
+            JCheckBoxMenuItem charsetItem = new JCheckBoxMenuItem(charset);
+
+            if (charset.equals("UTF-8")) {
+                charsetItem.setState(true);
+            }
+
+            charsetItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    Tab tab = (Tab) tabbedPane.getComponentAt(tabbedPane.getSelectedIndex());
+                    tab.setCharset(charset);
+
+                    updateCharsetMenu();
+                }
+            });
+
+            charsetMenu.add(charsetItem);
+        }
+        //
 
         viewMenu = propsX.createJMenu("View", "View");
         menuBar.add(viewMenu);
@@ -149,14 +174,30 @@ class Main {
         //
 
         tabbedPane = new JTabbedPane();
+        tabbedPane.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                updateCharsetMenu();
+                updateSession();
+            }
+        });
         f.add(tabbedPane, BorderLayout.CENTER);
 
         if (propsX.get("FileSave Session").equals("Yes") && !propsX.get("Session").isEmpty()) {
-            for (String fileName : propsX.get("Session").split(",")) {
-                if (fileName.equals("New") || fileName.isEmpty()) {
+            for (String fileInfo : propsX.get("Session").split(",")) {
+                String[] fileInfoSplit = fileInfo.split(";");
+
+                if (fileInfoSplit.length != 2) {
                     newTab();
                 } else {
-                    openTab(new File(fileName));
+                    String fileName = fileInfoSplit[0];
+                    String fileCharset = fileInfoSplit[1];
+
+                    if (fileName.isEmpty()) {
+                        newTab();
+                    } else {
+                        Tab tab = openTab(new File(fileName));
+                        tab.setCharset(fileCharset);
+                    }
                 }
             }
         } else {
@@ -166,13 +207,27 @@ class Main {
         f.setVisible(true);
     }
 
+    public static void updateCharsetMenu() {
+        Tab tab = (Tab) tabbedPane.getComponentAt(tabbedPane.getSelectedIndex());
+
+        for (Component i : charsetMenu.getMenuComponents()) {
+            JCheckBoxMenuItem ci = (JCheckBoxMenuItem) i;
+
+            if (!ci.getText().equals(tab.charset)) {
+                ci.setState(false);
+            } else {
+                ci.setState(true);
+            }
+        }
+    }
+
     public static void updateSession() {
         if (tabbedPane != null && propsX.get("FileSave Session").equals("Yes")) {
             String session = "";
             for (int i = 0; i < tabbedPane.getTabCount(); i++) {
                 Tab tab = (Tab) tabbedPane.getComponentAt(i);
                 if (tab.file != null) {
-                    session += (session.isEmpty() ? "" : ",") + tab.file.getAbsolutePath();
+                    session += (session.isEmpty() ? "" : ",") + tab.file.getAbsolutePath() + ";" + tab.charset;
                 } else {
                     session += (session.isEmpty() ? "" : ",") + "New";
                 }

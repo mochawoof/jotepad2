@@ -77,10 +77,10 @@ class Tab extends JPanel {
         theme.apply(textArea);
     }
 
-    public void reload(boolean force) {
+    public boolean reload(boolean force) {
         if (!force && !saved) {
             if (JOptionPane.showConfirmDialog(Main.f, "Are you sure you want to reload? Your unsaved changes will be lost.", "Confirm", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
-                return;
+                return false;
             }
         }
         try {
@@ -91,8 +91,18 @@ class Tab extends JPanel {
                 saved = true;
                 updateTitle();
             }
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
+        }
+    }
+
+    public void setCharset(String charsetName) {
+        String oldCharset = charset;
+        charset = charsetName;
+        if (!reload(false)) {
+            charset = oldCharset;
         }
     }
 }

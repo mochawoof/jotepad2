@@ -153,7 +153,7 @@ class Main {
 
         if (propsX.get("FileSave Session").equals("Yes") && !propsX.get("Session").isEmpty()) {
             for (String fileName : propsX.get("Session").split(",")) {
-                if (fileName.equals("New")) {
+                if (fileName.equals("New") || fileName.isEmpty()) {
                     newTab();
                 } else {
                     openTab(new File(fileName));

@@ -262,6 +262,7 @@ class Main {
             i++;
         }
         System.out.println(lafs);
+        System.out.println("System: " + UIManager.getSystemLookAndFeelClassName() + " Cross-Platform: " + UIManager.getCrossPlatformLookAndFeelClassName());
     }
 
     public static void setLaf(String laf) {

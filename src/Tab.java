@@ -25,9 +25,6 @@ class Tab extends JPanel {
         add(scrollPane, BorderLayout.CENTER);
 
         setTheme(Main.getThemeFromName(Main.propsX.get("ViewEditor Theme")));
-
-        Main.tabbedPane.addTab("New", this);
-        Main.tabbedPane.setSelectedIndex(Main.tabbedPane.getTabCount() - 1);
     }
 
     public int getTabIndex() {

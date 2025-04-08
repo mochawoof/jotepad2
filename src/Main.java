@@ -17,6 +17,8 @@ class Main {
     public static JMenu fileMenu;
     public static JMenuItem newItem;
     public static JMenuItem openItem;
+    public static JMenuItem saveItem;
+    public static JMenuItem saveAsItem;
     public static JMenuItem reloadItem;
     public static JMenuItem closeItem;
 
@@ -42,10 +44,15 @@ class Main {
             e.printStackTrace();
         }
 
+        printLafs();
         propsX = new PropertiesX(new File("jotepad2.properties")) {
             public void update() {
                 setLaf(get("ViewTheme"));
                 setAllTextAreasTheme(propsX.get("ViewEditor Theme"));
+
+                if (get("FileSave Session").equals("No")) {
+                    set("Session", "");
+                }
             }
         };
         propsX.update();
@@ -56,14 +63,16 @@ class Main {
         // Menu
         fileMenu = propsX.createJMenu("File", "File");
         menuBar.add(fileMenu);
+
         newItem = new JMenuItem("New");
         newItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
         newItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new Tab();
+                newTab();
             }
         });
         fileMenu.add(newItem);
+
         openItem = new JMenuItem("Open");
         openItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -76,14 +85,23 @@ class Main {
                 if (chooser.showOpenDialog(f) == JFileChooser.APPROVE_OPTION) {
                     propsX.set("LastOpenDirectory", chooser.getSelectedFile().getAbsolutePath());
 
-                    Tab tab = new Tab();
-                    tab.updateFile(chooser.getSelectedFile());
-                    tab.reload(true);
+                    openTab(chooser.getSelectedFile());
                 }
             }
         });
         openItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
         fileMenu.add(openItem);
+        fileMenu.addSeparator();
+
+        saveItem = new JMenuItem("Save");
+        saveItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
+        fileMenu.add(saveItem);
+
+        saveAsItem = new JMenuItem("Save As");
+        saveAsItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+        fileMenu.add(saveAsItem);
+        fileMenu.addSeparator();
+
         reloadItem = new JMenuItem("Reload");
         reloadItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
         reloadItem.addActionListener(new ActionListener() {
@@ -92,9 +110,12 @@ class Main {
             }
         });
         fileMenu.add(reloadItem);
+
         closeItem = new JMenuItem("Close");
         closeItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK));
         fileMenu.add(closeItem);
+        fileMenu.addSeparator();
+
         // Move save session item to end
         JMenuItem saveSessionItemTmp = fileMenu.getItem(0);
         fileMenu.remove(0);
@@ -128,18 +149,66 @@ class Main {
         tabbedPane = new JTabbedPane();
         f.add(tabbedPane, BorderLayout.CENTER);
 
-        new Tab();
+        newTab();
 
         f.setVisible(true);
     }
 
+    public static void updateSession() {
+        if (tabbedPane != null && propsX.get("FileSave Session").equals("Yes")) {
+            String session = "";
+            for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+                Tab tab = (Tab) tabbedPane.getComponentAt(i);
+                if (tab.file != null) {
+                    session += (session == "" ? "" : ",") + tab.file.getAbsolutePath();
+                } else {
+                    session += (session == "" ? "" : ",") + "New";
+                }
+            }
+            propsX.set("Session", session);
+        }
+    }
+
+    public static Tab newTab() {
+        Tab tab = new Tab();
+        tabbedPane.addTab("New", tab);
+        tabbedPane.setSelectedIndex(Main.tabbedPane.getTabCount() - 1);
+        
+        updateSession();
+        return tab;
+    }
+
+    public static Tab openTab(File file) {
+        Tab tab = newTab();
+        tab.updateFile(file);
+        tab.reload(true);
+
+        updateSession();
+        return tab;
+    }
+
+    public static void printLafs() {
+        String lafs = "Available lafs: ";
+        int i = 0;
+        for (UIManager.LookAndFeelInfo lafInfo : UIManager.getInstalledLookAndFeels()) {
+            lafs += (i == 0 ? "" : ", ") + lafInfo.getName();
+            i++;
+        }
+        System.out.println(lafs);
+    }
+
     public static void setLaf(String laf) {
         try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            for (UIManager.LookAndFeelInfo lafInfo : UIManager.getInstalledLookAndFeels()) {
-                if (lafInfo.getName().equals(laf)) {
-                    UIManager.setLookAndFeel(lafInfo.getClassName());
-                    break;
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+
+            if (laf.equals("System")) {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } else {
+                for (UIManager.LookAndFeelInfo lafInfo : UIManager.getInstalledLookAndFeels()) {
+                    if (lafInfo.getName().equals(laf)) {
+                        UIManager.setLookAndFeel(lafInfo.getClassName());
+                        break;
+                    }
                 }
             }
             SwingUtilities.updateComponentTreeUI(f);

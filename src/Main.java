@@ -9,6 +9,8 @@ import org.fife.ui.rtextarea.*;
 import org.fife.ui.rsyntaxtextarea.*;
 
 class Main {
+    public static final String VERSION = "2.0";
+
     public static JFrame f;
     public static PropertiesX propsX;
     public static JMenuBar menuBar;
@@ -135,10 +137,6 @@ class Main {
         for (String charset : charsets) {
             JCheckBoxMenuItem charsetItem = new JCheckBoxMenuItem(charset);
 
-            if (charset.equals("UTF-8")) {
-                charsetItem.setState(true);
-            }
-
             charsetItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     Tab tab = (Tab) tabbedPane.getComponentAt(tabbedPane.getSelectedIndex());
@@ -166,7 +164,7 @@ class Main {
         aboutItem = new JMenuItem("About");
         aboutItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(f, "Jotepad v2.0", "About Jotepad 2", JOptionPane.PLAIN_MESSAGE, new ImageIcon(f.getIconImage()));
+                JOptionPane.showMessageDialog(f, "Jotepad v" + VERSION, "About Jotepad 2", JOptionPane.PLAIN_MESSAGE, new ImageIcon(f.getIconImage()));
             }
         });
         aboutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
@@ -203,6 +201,7 @@ class Main {
         } else {
             newTab();
         }
+        updateCharsetMenu();
 
         f.setVisible(true);
     }

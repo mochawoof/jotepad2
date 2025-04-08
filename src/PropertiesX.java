@@ -15,10 +15,11 @@ class PropertiesX {
         props = new Properties();
         userChoices = new HashMap<String, String>();
         
-        setUserChoice("ViewTheme", "Metal", "Metal,System,Nimbus,CDE/Motif");
+        setUserChoice("ViewTheme", "Metal", "Metal,System,Nimbus,CDE/Motif,FlatLightLaf,FlatDarkLaf");
         setUserChoice("ViewEditor Theme", "Default", "Default,Default-alt,Dark,Druid,Eclipse,Idea,Monokai");
         setUserChoice("FileSave Session", "Yes", "Yes,No");
         props.setProperty("LastOpenDirectory", ".");
+        props.setProperty("Session", "");
 
         try {
             FileInputStream in = new FileInputStream(file.getPath());

@@ -12,7 +12,7 @@ class Tab extends JPanel {
     public RSyntaxTextArea textArea;
     public RTextScrollPane scrollPane;
     public File file = null;
-    public boolean saved = true;
+    public boolean saved = false;
     public String charset = "UTF-8";
 
     public Tab() {
@@ -60,6 +60,16 @@ class Tab extends JPanel {
         file = newFile;
         String fileName = file.getName();
         textArea.setSyntaxEditingStyle(getSyntaxConstant(fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length())));
+        updateTitle();
+    }
+
+    public void updateTitle() {
+        String fileName = "";
+        if (file == null) {
+            fileName = "New";
+        } else {
+            fileName = file.getName();
+        }
         Main.tabbedPane.setTitleAt(getTabIndex(), fileName + (saved ? "" : " *"));
     }
 
@@ -78,6 +88,8 @@ class Tab extends JPanel {
             if (file != null) {
                 byte[] bytes = Files.readAllBytes(file.toPath());
                 textArea.setText(new String(bytes, charset).replace("\r\n", "\n"));
+                saved = true;
+                updateTitle();
             }
         } catch (Exception e) {
             e.printStackTrace();

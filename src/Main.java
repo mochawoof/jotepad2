@@ -50,7 +50,9 @@ class Main {
                 setLaf(get("ViewTheme"));
                 setAllTextAreasTheme(propsX.get("ViewEditor Theme"));
 
-                if (get("FileSave Session").equals("No")) {
+                if (get("FileSave Session").equals("Yes")) {
+                    updateSession();
+                } else {
                     set("Session", "");
                 }
             }
@@ -149,7 +151,17 @@ class Main {
         tabbedPane = new JTabbedPane();
         f.add(tabbedPane, BorderLayout.CENTER);
 
-        newTab();
+        if (propsX.get("FileSave Session").equals("Yes") && !propsX.get("Session").isEmpty()) {
+            for (String fileName : propsX.get("Session").split(",")) {
+                if (fileName.equals("New")) {
+                    newTab();
+                } else {
+                    openTab(new File(fileName));
+                }
+            }
+        } else {
+            newTab();
+        }
 
         f.setVisible(true);
     }
@@ -160,9 +172,9 @@ class Main {
             for (int i = 0; i < tabbedPane.getTabCount(); i++) {
                 Tab tab = (Tab) tabbedPane.getComponentAt(i);
                 if (tab.file != null) {
-                    session += (session == "" ? "" : ",") + tab.file.getAbsolutePath();
+                    session += (session.isEmpty() ? "" : ",") + tab.file.getAbsolutePath();
                 } else {
-                    session += (session == "" ? "" : ",") + "New";
+                    session += (session.isEmpty() ? "" : ",") + "New";
                 }
             }
             propsX.set("Session", session);
@@ -171,7 +183,8 @@ class Main {
 
     public static Tab newTab() {
         Tab tab = new Tab();
-        tabbedPane.addTab("New", tab);
+        tabbedPane.addTab("", tab);
+        tab.updateTitle();
         tabbedPane.setSelectedIndex(Main.tabbedPane.getTabCount() - 1);
         
         updateSession();
@@ -203,6 +216,8 @@ class Main {
 
             if (laf.equals("System")) {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } else if (laf.equals("FlatLightLaf") || laf.equals("FlatDarkLaf")) {
+                UIManager.setLookAndFeel("com.formdev.flatlaf." + laf);
             } else {
                 for (UIManager.LookAndFeelInfo lafInfo : UIManager.getInstalledLookAndFeels()) {
                     if (lafInfo.getName().equals(laf)) {

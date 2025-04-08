@@ -15,7 +15,9 @@ class PropertiesX {
         props = new Properties();
         userChoices = new HashMap<String, String>();
         
-        setUserChoice("ViewTheme", "System", "System,Metal,Nimbus,CDE/Motif");
+        setUserChoice("ViewTheme", "Metal", "Metal,System,Nimbus,CDE/Motif");
+        setUserChoice("ViewEditor Theme", "Default", "Default,Default-alt,Dark,Druid,Eclipse,Idea,Monokai");
+        setUserChoice("FileSave Session", "Yes", "Yes,No");
         props.setProperty("LastOpenDirectory", ".");
 
         try {

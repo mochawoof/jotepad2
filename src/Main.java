@@ -4,6 +4,9 @@ import java.awt.event.*;
 
 import java.io.*;
 
+import org.fife.ui.rtextarea.*;
+import org.fife.ui.rsyntaxtextarea.*;
+
 class Main {
     public static JFrame f;
     public static PropertiesX propsX;
@@ -30,7 +33,7 @@ class Main {
 
     public static void main(String[] args) {
         f = new JFrame("Jotepad 2");
-        f.setSize(800, 600);
+        f.setSize(600, 400);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         try {
@@ -42,15 +45,16 @@ class Main {
         propsX = new PropertiesX(new File("jotepad2.properties")) {
             public void update() {
                 setLaf(get("ViewTheme"));
+                setAllTextAreasTheme(propsX.get("ViewEditor Theme"));
             }
         };
-        setLaf(propsX.get("ViewTheme"));
+        propsX.update();
 
         menuBar = new JMenuBar();
         f.setJMenuBar(menuBar);
 
         // Menu
-        fileMenu = new JMenu("File");
+        fileMenu = propsX.createJMenu("File", "File");
         menuBar.add(fileMenu);
         newItem = new JMenuItem("New");
         newItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
@@ -91,6 +95,10 @@ class Main {
         closeItem = new JMenuItem("Close");
         closeItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK));
         fileMenu.add(closeItem);
+        // Move save session item to end
+        JMenuItem saveSessionItemTmp = fileMenu.getItem(0);
+        fileMenu.remove(0);
+        fileMenu.add(saveSessionItemTmp);
 
         editMenu = new JMenu("Edit");
         //TODO
@@ -137,6 +145,26 @@ class Main {
             SwingUtilities.updateComponentTreeUI(f);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public static Theme getThemeFromName(String themeName) {
+        try {
+            Theme theme = Theme.load(Main.class.getResourceAsStream(
+                    "/org/fife/ui/rsyntaxtextarea/themes/" + themeName.toLowerCase() + ".xml"));
+            return theme;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static void setAllTextAreasTheme(String themeName) {
+        if (tabbedPane != null) {
+            Theme theme = getThemeFromName(Main.propsX.get("ViewEditor Theme"));
+            for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+                ((Tab) tabbedPane.getComponentAt(i)).setTheme(theme);
+            }
         }
     }
 }

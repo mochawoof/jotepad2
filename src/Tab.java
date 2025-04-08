@@ -12,7 +12,7 @@ class Tab extends JPanel {
     public RSyntaxTextArea textArea;
     public RTextScrollPane scrollPane;
     public File file = null;
-    public boolean saved = false;
+    public boolean saved = true;
     public String charset = "UTF-8";
 
     public Tab() {
@@ -23,6 +23,8 @@ class Tab extends JPanel {
 
         scrollPane = new RTextScrollPane(textArea);
         add(scrollPane, BorderLayout.CENTER);
+
+        setTheme(Main.getThemeFromName(Main.propsX.get("ViewEditor Theme")));
 
         Main.tabbedPane.addTab("New", this);
         Main.tabbedPane.setSelectedIndex(Main.tabbedPane.getTabCount() - 1);
@@ -62,6 +64,10 @@ class Tab extends JPanel {
         String fileName = file.getName();
         textArea.setSyntaxEditingStyle(getSyntaxConstant(fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length())));
         Main.tabbedPane.setTitleAt(getTabIndex(), fileName + (saved ? "" : " *"));
+    }
+
+    public void setTheme(Theme theme) {
+        theme.apply(textArea);
     }
 
     public void reload(boolean force) {

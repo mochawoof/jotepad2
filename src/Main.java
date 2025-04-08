@@ -90,7 +90,7 @@ class Main {
                 if (detailsAction != null) {detailsAction.actionPerformed(null);}
 
                 if (chooser.showOpenDialog(f) == JFileChooser.APPROVE_OPTION) {
-                    propsX.set("LastOpenDirectory", chooser.getSelectedFile().getAbsolutePath());
+                    propsX.set("LastOpenDirectory", chooser.getSelectedFile().getParentFile().getAbsolutePath());
 
                     openTab(chooser.getSelectedFile());
                 }
@@ -270,6 +270,7 @@ class Main {
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 
             if (laf.equals("System")) {
+                // Some Linux systems don't bother defining the system laf with GTK+
                 if (UIManager.getSystemLookAndFeelClassName().endsWith("MetalLookAndFeel")) {
                     setLaf("GTK+");
                     return;

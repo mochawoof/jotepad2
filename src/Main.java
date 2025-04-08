@@ -270,7 +270,12 @@ class Main {
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 
             if (laf.equals("System")) {
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                if (UIManager.getSystemLookAndFeelClassName().endsWith("MetalLookAndFeel")) {
+                    setLaf("GTK+");
+                    return;
+                } else {
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                }
             } else if (laf.equals("FlatLightLaf") || laf.equals("FlatDarkLaf")) {
                 UIManager.setLookAndFeel("com.formdev.flatlaf." + laf);
             } else {

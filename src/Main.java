@@ -84,13 +84,13 @@ class Main {
         openItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JFileChooser chooser = new JFileChooser();
-                chooser.setCurrentDirectory(new File(propsX.get("LastOpenDirectory")));
+                chooser.setCurrentDirectory(new File(propsX.get("Last Open Directory")));
 
                 Action detailsAction = chooser.getActionMap().get("viewTypeDetails");
                 if (detailsAction != null) {detailsAction.actionPerformed(null);}
 
                 if (chooser.showOpenDialog(f) == JFileChooser.APPROVE_OPTION) {
-                    propsX.set("LastOpenDirectory", chooser.getSelectedFile().getParentFile().getAbsolutePath());
+                    propsX.set("Last Open Directory", chooser.getSelectedFile().getParentFile().getAbsolutePath());
 
                     openTab(chooser.getSelectedFile());
                 }

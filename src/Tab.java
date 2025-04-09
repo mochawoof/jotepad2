@@ -90,6 +90,8 @@ class Tab extends JPanel {
             fileName = file.getName();
         }
         Main.tabbedPane.setTitleAt(getTabIndex(), fileName + (saved ? "" : " *"));
+        
+        SwingUtilities.updateComponentTreeUI(Main.tabbedPane);
     }
 
     public void setTheme(Theme theme) {

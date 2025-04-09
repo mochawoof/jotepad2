@@ -10,7 +10,7 @@ import org.fife.ui.rsyntaxtextarea.*;
 import org.fife.rsta.ui.*;
 
 class Main {
-    public static final String VERSION = "2.0";
+    public static final String VERSION = "2.0.1";
 
     public static JFrame f;
     public static PropertiesX propsX;

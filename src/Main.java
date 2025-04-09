@@ -40,10 +40,10 @@ class Main {
     public static JTabbedPane tabbedPane;
     public static JToolBar findBar;
     
-    public static JTextField findSearchField;
+    public static PlaceholderTextField findSearchField;
+    public static PlaceholderTextField findReplaceField;
     public static JButton findNextButton;
     public static JButton findPreviousButton;
-    public static JLabel findLabel;
     public static NakedTabButton findCloseButton;
 
     public static void main(String[] args) {
@@ -169,7 +169,7 @@ class Main {
 
             charsetItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    Tab tab = (Tab) tabbedPane.getComponentAt(tabbedPane.getSelectedIndex());
+                    Tab tab = getSelectedTab();
                     tab.setCharset(charset, false);
 
                     updateCharsetMenu();
@@ -216,13 +216,18 @@ class Main {
         f.add(findBar, BorderLayout.PAGE_START);
         closeFind();
 
-        findSearchField = new JTextField(30);
+        findSearchField = new PlaceholderTextField(10);
+        findSearchField.placeholder = "Find";
         findSearchField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 find(0);
             }
         });
         findBar.add(findSearchField);
+
+        findReplaceField = new PlaceholderTextField(10);
+        findReplaceField.placeholder = "Replace";
+        findBar.add(findReplaceField);
         
         findNextButton = new JButton("Find Next");
         findNextButton.addActionListener(new ActionListener() {
@@ -238,8 +243,6 @@ class Main {
             }
         });
         findBar.add(findPreviousButton);
-        findLabel = new JLabel("");
-        findBar.add(findLabel);
 
         // Create action
         Action findCloseAction = new AbstractAction("findClose") {
@@ -285,6 +288,10 @@ class Main {
     }
 
     public static void closeFind() {
+        Tab tab = getSelectedTab();
+        if (tab != null) {
+            tab.textArea.clearMarkAllHighlights();
+        }
         findBar.setVisible(false);
     }
 
@@ -292,8 +299,30 @@ class Main {
         findBar.setVisible(true);
     }
 
+    public static Tab getSelectedTab() {
+        int index = tabbedPane.getSelectedIndex();
+        if (index != -1) {
+            return (Tab) tabbedPane.getComponentAt(index);
+        } else {
+            return null;
+        }
+    }
+
     public static void find(int mode) {
         // 0 = Next, 1 = Previous
+        SearchContext context = new SearchContext();
+
+        if (findSearchField.getText().length() == 0) {
+            return;
+        }
+
+        context.setSearchFor(findSearchField.getText());
+        context.setMatchCase(true);
+        context.setRegularExpression(false);
+        context.setSearchForward(mode == 0);
+        context.setWholeWord(false);
+
+        SearchEngine.find(getSelectedTab().textArea, context);
     }
 
     public static void saveAs() {
@@ -372,7 +401,7 @@ class Main {
     }
 
     public static void updateCharsetMenu() {
-        Tab tab = (Tab) tabbedPane.getComponentAt(tabbedPane.getSelectedIndex());
+        Tab tab = getSelectedTab();
 
         for (Component i : charsetMenu.getMenuComponents()) {
             JCheckBoxMenuItem ci = (JCheckBoxMenuItem) i;

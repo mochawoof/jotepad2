@@ -44,6 +44,7 @@ class Main {
     public static JButton findNextButton;
     public static JButton findPreviousButton;
     public static JLabel findLabel;
+    public static NakedTabButton findCloseButton;
 
     public static void main(String[] args) {
         f = new JFrame("Jotepad 2");
@@ -154,7 +155,7 @@ class Main {
         findItem = new JMenuItem("Find");
         findItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                findBar.setVisible(true);
+                openFind();
                 findSearchField.requestFocus();
             }
         });
@@ -203,6 +204,7 @@ class Main {
         tabbedPane = new JTabbedPane();
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
+                closeFind();
                 updateCharsetMenu();
                 updateSession();
             }
@@ -210,8 +212,9 @@ class Main {
         f.add(tabbedPane, BorderLayout.CENTER);
 
         findBar = new JToolBar();
+        findBar.setLayout(new BoxLayout(findBar, BoxLayout.X_AXIS));
         f.add(findBar, BorderLayout.PAGE_START);
-        findBar.setVisible(false);
+        closeFind();
 
         findSearchField = new JTextField(30);
         findSearchField.addActionListener(new ActionListener() {
@@ -220,6 +223,7 @@ class Main {
             }
         });
         findBar.add(findSearchField);
+        
         findNextButton = new JButton("Find Next");
         findNextButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -236,6 +240,23 @@ class Main {
         findBar.add(findPreviousButton);
         findLabel = new JLabel("");
         findBar.add(findLabel);
+
+        // Create action
+        Action findCloseAction = new AbstractAction("findClose") {
+            public void actionPerformed(ActionEvent e) {
+                closeFind();
+            }
+        };
+        findCloseAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
+
+        findCloseButton = new NakedTabButton(findCloseAction);
+        // Add action
+        findCloseButton.getActionMap().put("findClose", findCloseAction);
+        findCloseButton.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+            (KeyStroke) findCloseAction.getValue(Action.ACCELERATOR_KEY),
+            "findClose"
+        );
+        findBar.add(findCloseButton);
 
         if (propsX.get("FileSave Session").equals("Yes") && !propsX.get("Session").isEmpty()) {
             for (String fileInfo : propsX.get("Session").split(",")) {
@@ -261,6 +282,14 @@ class Main {
         updateCharsetMenu();
 
         f.setVisible(true);
+    }
+
+    public static void closeFind() {
+        findBar.setVisible(false);
+    }
+
+    public static void openFind() {
+        findBar.setVisible(true);
     }
 
     public static void find(int mode) {

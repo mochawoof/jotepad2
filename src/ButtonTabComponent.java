@@ -30,7 +30,6 @@
  */ 
 
 import javax.swing.*;
-import javax.swing.*;
 import javax.swing.plaf.basic.BasicButtonUI;
 import java.awt.*;
 import java.awt.event.*;
@@ -73,24 +72,9 @@ public class ButtonTabComponent extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 0));
     }
 
-    private class TabButton extends JButton implements ActionListener {
+    public class TabButton extends JButton implements ActionListener {
         public TabButton() {
-            int size = 17;
-            setPreferredSize(new Dimension(size, size));
-            setToolTipText("Close");
-            //Make the button looks the same for all Laf's
-            setUI(new BasicButtonUI());
-            //Make it transparent
-            setContentAreaFilled(false);
-            //No need to be focusable
-            setFocusable(false);
-            setBorder(BorderFactory.createEtchedBorder());
-            setBorderPainted(false);
-            //Making nice rollover effect
-            //we use the same listener for all buttons
-            addMouseListener(buttonMouseListener);
-            setRolloverEnabled(true);
-            //Close the proper tab by clicking the button
+            doConstructor(this);
             addActionListener(this);
         }
 
@@ -108,22 +92,46 @@ public class ButtonTabComponent extends JPanel {
 
         //paint the cross
         protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            Graphics2D g2 = (Graphics2D) g.create();
-            //shift the image for pressed buttons
-            if (getModel().isPressed()) {
-                g2.translate(1, 1);
-            }
-            g2.setStroke(new BasicStroke(2));
-            g2.setColor(Color.BLACK);
-            if (getModel().isRollover()) {
-                g2.setColor(Color.RED);
-            }
-            int delta = 6;
-            g2.drawLine(delta, delta, getWidth() - delta - 1, getHeight() - delta - 1);
-            g2.drawLine(getWidth() - delta - 1, delta, delta, getHeight() - delta - 1);
-            g2.dispose();
+            doPaint(this, g);
         }
+    }
+
+    public static void doPaint(JButton b, Graphics g) {
+        //super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g.create();
+        //shift the image for pressed buttons
+        if (b.getModel().isPressed()) {
+            g2.translate(1, 1);
+        }
+        g2.setStroke(new BasicStroke(2));
+        g2.setColor(UIManager.getColor("Label.foreground"));
+        if (b.getModel().isRollover()) {
+            g2.setColor(Color.RED);
+        }
+        int delta = 5;
+        g2.drawLine(delta, delta, b.getWidth() - delta - 1, b.getHeight() - delta - 1);
+        g2.drawLine(b.getWidth() - delta - 1, delta, delta, b.getHeight() - delta - 1);
+        g2.dispose();
+    }
+
+    public static void doConstructor(JButton b) {
+        int size = 17;
+        b.setText(" ");
+        b.setPreferredSize(new Dimension(size, size));
+        b.setToolTipText("Close");
+        //Make the button looks the same for all Laf's
+        b.setUI(new BasicButtonUI());
+        //Make it transparent
+        b.setContentAreaFilled(false);
+        //No need to be focusable
+        b.setFocusable(false);
+        b.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        b.setBorderPainted(false);
+        //Making nice rollover effect
+        //we use the same listener for all buttons
+        b.addMouseListener(buttonMouseListener);
+        b.setRolloverEnabled(true);
+        b.setMargin(new Insets(2, 0, 0, 0));
     }
 
     private final static MouseListener buttonMouseListener = new MouseAdapter() {

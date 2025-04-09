@@ -42,13 +42,18 @@ class Main {
     
     public static PlaceholderTextField findSearchField;
     public static PlaceholderTextField findReplaceField;
+    public static JCheckBox findMatchCase;
+    public static JCheckBox findRegex;
+    public static JCheckBox findWholeWord;
     public static JButton findNextButton;
     public static JButton findPreviousButton;
+    public static JButton findReplaceButton;
+    public static JButton findReplaceAllButton;
     public static NakedTabButton findCloseButton;
 
     public static void main(String[] args) {
         f = new JFrame("Jotepad 2");
-        f.setSize(600, 400);
+        f.setSize(800, 600);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         try {
@@ -228,6 +233,13 @@ class Main {
         findReplaceField = new PlaceholderTextField(10);
         findReplaceField.placeholder = "Replace";
         findBar.add(findReplaceField);
+
+        findMatchCase = new JCheckBox("Match Case");
+        findBar.add(findMatchCase);
+        findRegex = new JCheckBox("Regex");
+        findBar.add(findRegex);
+        findWholeWord = new JCheckBox("Whole Word");
+        findBar.add(findWholeWord);
         
         findNextButton = new JButton("Find Next");
         findNextButton.addActionListener(new ActionListener() {
@@ -243,6 +255,21 @@ class Main {
             }
         });
         findBar.add(findPreviousButton);
+
+        findReplaceButton = new JButton("Replace");
+        findReplaceButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+        findBar.add(findReplaceButton);
+        findReplaceAllButton = new JButton("Replace All");
+        findReplaceAllButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+        findBar.add(findReplaceAllButton);
 
         // Create action
         Action findCloseAction = new AbstractAction("findClose") {
@@ -282,6 +309,8 @@ class Main {
         } else {
             newTab();
         }
+
+        propsX.update();
         updateCharsetMenu();
 
         f.setVisible(true);
@@ -317,12 +346,14 @@ class Main {
         }
 
         context.setSearchFor(findSearchField.getText());
-        context.setMatchCase(true);
-        context.setRegularExpression(false);
+        context.setMatchCase(findMatchCase.isSelected());
+        context.setRegularExpression(findRegex.isSelected());
         context.setSearchForward(mode == 0);
-        context.setWholeWord(false);
+        context.setWholeWord(findWholeWord.isSelected());
 
-        SearchEngine.find(getSelectedTab().textArea, context);
+        if (!SearchEngine.find(getSelectedTab().textArea, context).wasFound()) {
+            getSelectedTab().textArea.clearMarkAllHighlights();
+        }
     }
 
     public static void saveAs() {

@@ -118,6 +118,7 @@ public class ButtonTabComponent extends JPanel {
         int size = 17;
         b.setText(" ");
         b.setPreferredSize(new Dimension(size, size));
+        b.setMinimumSize(b.getPreferredSize());
         b.setToolTipText("Close");
         //Make the button looks the same for all Laf's
         b.setUI(new BasicButtonUI());

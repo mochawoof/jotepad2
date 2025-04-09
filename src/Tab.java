@@ -13,8 +13,9 @@ class Tab extends JPanel {
     public RSyntaxTextArea textArea;
     public RTextScrollPane scrollPane;
     public File file = null;
-    public boolean saved = false;
+    public boolean saved = true;
     public String charset = "UTF-8";
+    public boolean initialized = false;
 
     public Tab() {
         setLayout(new BorderLayout());
@@ -70,15 +71,25 @@ class Tab extends JPanel {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println(e);
         }
         return syn.SYNTAX_STYLE_NONE;
+    }
+
+    public void updateSyntaxStyle() {
+        String fileName = "";
+        if (file == null) {
+            fileName = "New";
+            textArea.setSyntaxEditingStyle(new SyntaxTypes().SYNTAX_STYLE_NONE);
+        } else {
+            fileName = file.getName();
+            textArea.setSyntaxEditingStyle(getSyntaxConstant(fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length())));
+        }
     }
 
     public void updateFile(File newFile) {
         file = newFile;
         String fileName = file.getName();
-        textArea.setSyntaxEditingStyle(getSyntaxConstant(fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length())));
         updateTitle();
     }
 
@@ -90,8 +101,13 @@ class Tab extends JPanel {
             fileName = file.getName();
         }
         Main.tabbedPane.setTitleAt(getTabIndex(), fileName + (saved ? "" : " *"));
-        
-        SwingUtilities.updateComponentTreeUI(Main.tabbedPane);
+        updateSyntaxStyle();
+
+        try {
+            SwingUtilities.updateComponentTreeUI(Main.tabbedPane);
+        } catch (Exception e) {
+            System.err.println(e);
+        }
     }
 
     public void setTheme(Theme theme) {
@@ -110,11 +126,12 @@ class Tab extends JPanel {
                 byte[] bytes = Files.readAllBytes(file.toPath());
                 textArea.setText(new String(bytes, charset).replace("\r\n", "\n"));
                 saved = true;
+                initialized = true;
                 updateTitle();
             }
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println(e);
             return false;
         }
     }

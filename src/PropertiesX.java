@@ -27,7 +27,7 @@ class PropertiesX {
             props.load(in);
             in.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println(e);
         }
     }
 
@@ -55,7 +55,7 @@ class PropertiesX {
             props.store(out, outNote);
             out.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println(e);
         }
     }
 

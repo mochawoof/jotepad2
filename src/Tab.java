@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.nio.file.*;
+import javax.swing.event.*;
 
 import org.fife.ui.rtextarea.*;
 import org.fife.ui.rsyntaxtextarea.*;
@@ -20,6 +21,24 @@ class Tab extends JPanel {
         
         textArea = new RSyntaxTextArea(20, 60);
         textArea.setCodeFoldingEnabled(true);
+        textArea.getDocument().addDocumentListener(new DocumentListener() {
+            public void changedUpdate(DocumentEvent e) {
+                onChange();
+            }
+
+            public void insertUpdate(DocumentEvent e) {
+                onChange();
+            }
+
+            public void removeUpdate(DocumentEvent e) {
+                onChange();
+            }
+
+            public void onChange() {
+                saved = false;
+                updateTitle();
+            }
+        });
 
         scrollPane = new RTextScrollPane(textArea);
         add(scrollPane, BorderLayout.CENTER);
@@ -98,10 +117,10 @@ class Tab extends JPanel {
         }
     }
 
-    public void setCharset(String charsetName) {
+    public void setCharset(String charsetName, boolean force) {
         String oldCharset = charset;
         charset = charsetName;
-        if (!reload(false)) {
+        if (!reload(force)) {
             charset = oldCharset;
         }
     }

@@ -16,6 +16,7 @@ class Main {
     public static JMenuBar menuBar;
     // Menu
     public static JMenu editMenu;
+    public static JMenuItem findItem;
     public static JMenu charsetMenu;
     public static String[] charsets = new String[] {"UTF-8", "US-ASCII", "ISO-8859-1", "UTF-16", "UTF-16BE", "UTF-16LE"};
 
@@ -37,6 +38,12 @@ class Main {
     //
     
     public static JTabbedPane tabbedPane;
+    public static JToolBar findBar;
+    
+    public static JTextField findSearchField;
+    public static JButton findNextButton;
+    public static JButton findPreviousButton;
+    public static JLabel findLabel;
 
     public static void main(String[] args) {
         f = new JFrame("Jotepad 2");
@@ -83,13 +90,10 @@ class Main {
         openItem = new JMenuItem("Open");
         openItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                JFileChooser chooser = new JFileChooser();
+                DetailsFileChooser chooser = new DetailsFileChooser();
                 chooser.setCurrentDirectory(new File(propsX.get("Last Open Directory")));
 
-                Action detailsAction = chooser.getActionMap().get("viewTypeDetails");
-                if (detailsAction != null) {detailsAction.actionPerformed(null);}
-
-                if (chooser.showOpenDialog(f) == JFileChooser.APPROVE_OPTION) {
+                if (chooser.showOpenDialog(f) == DetailsFileChooser.APPROVE_OPTION) {
                     propsX.set("Last Open Directory", chooser.getSelectedFile().getParentFile().getAbsolutePath());
 
                     openTab(chooser.getSelectedFile());
@@ -101,10 +105,20 @@ class Main {
         fileMenu.addSeparator();
 
         saveItem = new JMenuItem("Save");
+        saveItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                saveTab(-1, null);
+            }
+        });
         saveItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
         fileMenu.add(saveItem);
 
         saveAsItem = new JMenuItem("Save As");
+        saveAsItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                saveAs();
+            }
+        });
         saveAsItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
         fileMenu.add(saveAsItem);
         fileMenu.addSeparator();
@@ -119,6 +133,11 @@ class Main {
         fileMenu.add(reloadItem);
 
         closeItem = new JMenuItem("Close");
+        closeItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                closeTab(-1);
+            }
+        });
         closeItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK));
         fileMenu.add(closeItem);
         fileMenu.addSeparator();
@@ -132,6 +151,16 @@ class Main {
         editMenu = new JMenu("Edit");
         menuBar.add(editMenu);
 
+        findItem = new JMenuItem("Find");
+        findItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                findBar.setVisible(true);
+                findSearchField.requestFocus();
+            }
+        });
+        findItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK));
+        editMenu.add(findItem);
+
         charsetMenu = new JMenu("Charset");
         editMenu.add(charsetMenu);
         for (String charset : charsets) {
@@ -140,7 +169,7 @@ class Main {
             charsetItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     Tab tab = (Tab) tabbedPane.getComponentAt(tabbedPane.getSelectedIndex());
-                    tab.setCharset(charset);
+                    tab.setCharset(charset, false);
 
                     updateCharsetMenu();
                 }
@@ -180,6 +209,34 @@ class Main {
         });
         f.add(tabbedPane, BorderLayout.CENTER);
 
+        findBar = new JToolBar();
+        f.add(findBar, BorderLayout.PAGE_START);
+        findBar.setVisible(false);
+
+        findSearchField = new JTextField(30);
+        findSearchField.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                find(0);
+            }
+        });
+        findBar.add(findSearchField);
+        findNextButton = new JButton("Find Next");
+        findNextButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                find(0);
+            }
+        });
+        findBar.add(findNextButton);
+        findPreviousButton = new JButton("Find Previous");
+        findPreviousButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                find(1);
+            }
+        });
+        findBar.add(findPreviousButton);
+        findLabel = new JLabel("");
+        findBar.add(findLabel);
+
         if (propsX.get("FileSave Session").equals("Yes") && !propsX.get("Session").isEmpty()) {
             for (String fileInfo : propsX.get("Session").split(",")) {
                 String[] fileInfoSplit = fileInfo.split(";");
@@ -194,7 +251,7 @@ class Main {
                         newTab();
                     } else {
                         Tab tab = openTab(new File(fileName));
-                        tab.setCharset(fileCharset);
+                        tab.setCharset(fileCharset, true);
                     }
                 }
             }
@@ -204,6 +261,85 @@ class Main {
         updateCharsetMenu();
 
         f.setVisible(true);
+    }
+
+    public static void find(int mode) {
+        // 0 = Next, 1 = Previous
+    }
+
+    public static void saveAs() {
+        DetailsFileChooser chooser = new DetailsFileChooser();
+        chooser.setCurrentDirectory(new File(propsX.get("Last Open Directory")));
+
+        if (chooser.showSaveDialog(f) == DetailsFileChooser.APPROVE_OPTION) {
+            if (chooser.getSelectedFile().exists()) {
+                if (JOptionPane.showConfirmDialog(f, "This file already exists. Are you sure you want to replace it?", "Confirm", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+                    return;
+                }
+            }
+
+            saveTab(-1, chooser.getSelectedFile());
+        }
+    }
+
+    public static void saveTab(int tabIndex, File file) {
+        int index = tabIndex;
+        File saveFile = file;
+
+        if (tabIndex == -1) {
+            // If -1, save current tab
+            index = tabbedPane.getSelectedIndex();
+        }
+
+        Tab tab = (Tab) tabbedPane.getComponentAt(index);
+
+        if (file == null) {
+            saveFile = tab.file;
+
+            if (tab.file == null) {
+                saveAs();
+                return;
+            }
+        }
+
+        try {
+            FileOutputStream out = new FileOutputStream(saveFile);
+            out.write(tab.textArea.getText().getBytes());
+            out.close();
+
+            tab.file = saveFile;
+            tab.saved = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(f, "Failed to save file.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        tab.updateTitle();
+        updateSession();
+    }
+
+    public static void closeTab(int tabIndex) {
+        if (tabbedPane.getTabCount() > 1) {
+
+            int index = tabIndex;
+
+            if (tabIndex == -1) {
+                // If -1, close current tab
+                index = tabbedPane.getSelectedIndex();
+            }
+
+            Tab tab = (Tab) tabbedPane.getComponentAt(index);
+            if (!tab.saved) {
+                if (JOptionPane.showConfirmDialog(f, "Are you sure you want to close this file? Your unsaved changes will be lost.", "Confirm", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+                    return;
+                }
+            }
+
+            tabbedPane.remove(index);
+
+            updateCharsetMenu();
+            updateSession();
+        }
     }
 
     public static void updateCharsetMenu() {
@@ -239,8 +375,9 @@ class Main {
         Tab tab = new Tab();
         tabbedPane.addTab("", tab);
         tab.updateTitle();
-        tabbedPane.setSelectedIndex(Main.tabbedPane.getTabCount() - 1);
-        
+        tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
+        tabbedPane.setTabComponentAt(tabbedPane.getTabCount() - 1, new ButtonTabComponent(tabbedPane));
+
         updateSession();
         return tab;
     }

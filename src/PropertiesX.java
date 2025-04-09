@@ -17,7 +17,7 @@ class PropertiesX {
         
         props.setProperty("Version", Main.VERSION);
         setUserChoice("ViewTheme", "Metal", "Metal,System,Nimbus,CDE/Motif,FlatLightLaf,FlatDarkLaf");
-        setUserChoice("ViewEditor Theme", "Default", "Default,Default-alt,Dark,Druid,Eclipse,Idea,Monokai");
+        setUserChoice("ViewEditor Theme", "Default", "Default,Default-alt,Dark,Druid,Eclipse,Idea,Monokai,VS");
         setUserChoice("FileSave Session", "Yes", "Yes,No");
         props.setProperty("Last Open Directory", ".");
         props.setProperty("Session", "");

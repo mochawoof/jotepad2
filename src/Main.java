@@ -7,6 +7,7 @@ import java.io.*;
 
 import org.fife.ui.rtextarea.*;
 import org.fife.ui.rsyntaxtextarea.*;
+import org.fife.rsta.ui.*;
 
 class Main {
     public static final String VERSION = "2.0";
@@ -38,18 +39,6 @@ class Main {
     //
     
     public static JTabbedPane tabbedPane;
-    public static JToolBar findBar;
-    
-    public static PlaceholderTextField findSearchField;
-    public static PlaceholderTextField findReplaceField;
-    public static JCheckBox findMatchCase;
-    public static JCheckBox findRegex;
-    public static JCheckBox findWholeWord;
-    public static JButton findNextButton;
-    public static JButton findPreviousButton;
-    public static JButton findReplaceButton;
-    public static JButton findReplaceAllButton;
-    public static NakedTabButton findCloseButton;
 
     public static void main(String[] args) {
         f = new JFrame("Jotepad 2");
@@ -160,8 +149,7 @@ class Main {
         findItem = new JMenuItem("Find");
         findItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                openFind();
-                findSearchField.requestFocus();
+                
             }
         });
         findItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK));
@@ -209,84 +197,11 @@ class Main {
         tabbedPane = new JTabbedPane();
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                closeFind();
                 updateCharsetMenu();
                 updateSession();
             }
         });
         f.add(tabbedPane, BorderLayout.CENTER);
-
-        findBar = new JToolBar();
-        findBar.setLayout(new BoxLayout(findBar, BoxLayout.X_AXIS));
-        f.add(findBar, BorderLayout.PAGE_START);
-        closeFind();
-
-        findSearchField = new PlaceholderTextField(10);
-        findSearchField.placeholder = "Find";
-        findSearchField.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                find(0);
-            }
-        });
-        findBar.add(findSearchField);
-
-        findReplaceField = new PlaceholderTextField(10);
-        findReplaceField.placeholder = "Replace";
-        findBar.add(findReplaceField);
-
-        findMatchCase = new JCheckBox("Match Case");
-        findBar.add(findMatchCase);
-        findRegex = new JCheckBox("Regex");
-        findBar.add(findRegex);
-        findWholeWord = new JCheckBox("Whole Word");
-        findBar.add(findWholeWord);
-        
-        findNextButton = new JButton("Find Next");
-        findNextButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                find(0);
-            }
-        });
-        findBar.add(findNextButton);
-        findPreviousButton = new JButton("Find Previous");
-        findPreviousButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                find(1);
-            }
-        });
-        findBar.add(findPreviousButton);
-
-        findReplaceButton = new JButton("Replace");
-        findReplaceButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-
-            }
-        });
-        findBar.add(findReplaceButton);
-        findReplaceAllButton = new JButton("Replace All");
-        findReplaceAllButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-
-            }
-        });
-        findBar.add(findReplaceAllButton);
-
-        // Create action
-        Action findCloseAction = new AbstractAction("findClose") {
-            public void actionPerformed(ActionEvent e) {
-                closeFind();
-            }
-        };
-        findCloseAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
-
-        findCloseButton = new NakedTabButton(findCloseAction);
-        // Add action
-        findCloseButton.getActionMap().put("findClose", findCloseAction);
-        findCloseButton.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-            (KeyStroke) findCloseAction.getValue(Action.ACCELERATOR_KEY),
-            "findClose"
-        );
-        findBar.add(findCloseButton);
 
         if (propsX.get("FileSave Session").equals("Yes") && !propsX.get("Session").isEmpty()) {
             for (String fileInfo : propsX.get("Session").split(",")) {
@@ -316,43 +231,12 @@ class Main {
         f.setVisible(true);
     }
 
-    public static void closeFind() {
-        Tab tab = getSelectedTab();
-        if (tab != null) {
-            tab.textArea.clearMarkAllHighlights();
-        }
-        findBar.setVisible(false);
-    }
-
-    public static void openFind() {
-        findBar.setVisible(true);
-    }
-
     public static Tab getSelectedTab() {
         int index = tabbedPane.getSelectedIndex();
         if (index != -1) {
             return (Tab) tabbedPane.getComponentAt(index);
         } else {
             return null;
-        }
-    }
-
-    public static void find(int mode) {
-        // 0 = Next, 1 = Previous
-        SearchContext context = new SearchContext();
-
-        if (findSearchField.getText().length() == 0) {
-            return;
-        }
-
-        context.setSearchFor(findSearchField.getText());
-        context.setMatchCase(findMatchCase.isSelected());
-        context.setRegularExpression(findRegex.isSelected());
-        context.setSearchForward(mode == 0);
-        context.setWholeWord(findWholeWord.isSelected());
-
-        if (!SearchEngine.find(getSelectedTab().textArea, context).wasFound()) {
-            getSelectedTab().textArea.clearMarkAllHighlights();
         }
     }
 

@@ -6,21 +6,17 @@ import java.awt.event.*;
 
 class PropertiesX {
     public Properties props;
-    public File file;
+    public File file = new File("jotepad2.properties");
     public HashMap<String, String> userChoices;
     public String outNote = "Jotepad2 properties";
     
-    public PropertiesX(File f) {
-        file = f;
+    public PropertiesX() {
         props = new Properties();
         userChoices = new HashMap<String, String>();
         
-        props.setProperty("Version", Main.VERSION);
-        setUserChoice("ViewTheme", "Metal", "Metal,System,Nimbus,CDE/Motif,FlatLightLaf,FlatDarkLaf");
-        setUserChoice("ViewEditor Theme", "VS", "Default,Default-alt,Dark,Druid,Eclipse,Idea,Monokai,VS");
-        setUserChoice("FileSave Session", "Yes", "Yes,No");
-        props.setProperty("Last Open Directory", ".");
-        props.setProperty("Session", "");
+        props.setProperty("Version", Main.version);
+        setUserChoice("viewTheme", "Cross-Platform", "Cross-Platform,System,Nimbus,CDE/Motif,FlatLightLaf,FlatDarkLaf");
+        setUserChoice("viewEditor Theme", "Default", "Default,Default-Alt,Dark,Druid,Eclipse,Idea,Monokai,VS");
 
         try {
             FileInputStream in = new FileInputStream(file.getPath());

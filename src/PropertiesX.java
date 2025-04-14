@@ -15,15 +15,17 @@ class PropertiesX {
         userChoices = new HashMap<String, String>();
         
         props.setProperty("Version", Main.version);
-        setUserChoice("viewTheme", "Cross-Platform", "Cross-Platform,System,Nimbus,CDE/Motif,FlatLightLaf,FlatDarkLaf");
-        setUserChoice("viewEditor Theme", "Default", "Default,Default-Alt,Dark,Druid,Eclipse,Idea,Monokai,VS");
+        setUserChoice("ViewTheme", "Cross-Platform", "Cross-Platform,System,Nimbus,CDE/Motif,FlatLightLaf,FlatDarkLaf");
+        setUserChoice("ViewEditor Theme", "Default", "Default,Default-Alt,Dark,Druid,Eclipse,Idea,Monokai,VS");
+        props.setProperty("Window Size", "600x400");
+        props.setProperty("Window Maximized", "No");
 
         try {
             FileInputStream in = new FileInputStream(file.getPath());
             props.load(in);
             in.close();
         } catch (Exception e) {
-            System.err.println(e);
+            e.printStackTrace();
         }
     }
 
@@ -51,7 +53,7 @@ class PropertiesX {
             props.store(out, outNote);
             out.close();
         } catch (Exception e) {
-            System.err.println(e);
+            e.printStackTrace();
         }
     }
 

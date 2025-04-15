@@ -1,11 +1,14 @@
 import javax.swing.*;
 import java.awt.*;
+import java.io.*;
 
 import org.fife.ui.rsyntaxtextarea.*;
 import org.fife.ui.rtextarea.*;
 
 class Tab extends JPanel {
     public RSyntaxTextArea textArea;
+    public File file = null;
+
     public Tab() {
         setLayout(new BorderLayout());
         

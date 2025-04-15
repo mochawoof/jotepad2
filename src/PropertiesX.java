@@ -19,6 +19,7 @@ class PropertiesX {
         setUserChoice("ViewEditor Theme", "Default", "Default,Default-Alt,Dark,Druid,Eclipse,Idea,Monokai,VS");
         props.setProperty("Window Size", "600x400");
         props.setProperty("Window Maximized", "No");
+        props.setProperty("Last Open Directory", ".");
 
         try {
             FileInputStream in = new FileInputStream(file.getPath());

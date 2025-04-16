@@ -5,6 +5,7 @@ import javax.swing.event.*;
 import java.io.*;
 import java.nio.file.*;
 import java.lang.reflect.*;
+import java.net.URI;
 
 import org.fife.ui.rsyntaxtextarea.*;
 import org.fife.ui.rtextarea.*;
@@ -21,7 +22,10 @@ class Main {
             public static JMenuItem closeItem;
         public static JMenu editMenu;
         public static JMenu viewMenu;
+        public static JMenu pluginsMenu;
+            public static JMenuItem noneAvailableItem;
         public static JMenu helpMenu;
+            public static JMenuItem onlineHelpItem;
             public static JMenuItem aboutItem;
 
     public static final String version = "2.3";
@@ -129,12 +133,31 @@ class Main {
             viewMenu = propsX.createJMenu("View", "View");
             menuBar.add(viewMenu);
 
+            pluginsMenu = new JMenu("Plugins");
+            menuBar.add(pluginsMenu);
+                noneAvailableItem = new JMenuItem("None Available");
+                noneAvailableItem.setEnabled(false);
+                pluginsMenu.add(noneAvailableItem);
+
             helpMenu = new JMenu("Help");
             menuBar.add(helpMenu);
+                onlineHelpItem = new JMenuItem("Online Help");
+                onlineHelpItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
+                onlineHelpItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        try {
+                            Desktop.getDesktop().browse(new URI("https://github.com/mochawoof/jotepad2"));
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                });
+                helpMenu.add(onlineHelpItem);
+
                 aboutItem = new JMenuItem("About");
                 aboutItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        JOptionPane.showMessageDialog(f, "Jotepad v" + version + "\nJava " + System.getProperty("java.version") + " " + System.getProperty("java.vendor") + "\n" + System.getProperty("os.name") + " " + System.getProperty("os.version") + " " + System.getProperty("os.arch") + "\n\nVisit https://github.com/mochawoof/jotepad2 for extra help.", "About Jotepad 2", JOptionPane.PLAIN_MESSAGE, new ImageIcon(f.getIconImage()));
+                        JOptionPane.showMessageDialog(f, "Jotepad v" + version + "\nJava " + System.getProperty("java.version") + " " + System.getProperty("java.vendor") + "\n" + System.getProperty("os.name") + " " + System.getProperty("os.version") + " " + System.getProperty("os.arch"), "About Jotepad 2", JOptionPane.PLAIN_MESSAGE, new ImageIcon(f.getIconImage()));
                     }
                 });
                 helpMenu.add(aboutItem);
@@ -291,7 +314,7 @@ class Main {
                 chooser.setCurrentDirectory(tab.file.getParentFile());
             }
 
-            if (chooser.showOpenDialog(f) == JFileChooser.APPROVE_OPTION) {
+            if (chooser.showSaveDialog(f) == JFileChooser.APPROVE_OPTION) {
                 save(i, chooser.getSelectedFile());
             }
         }

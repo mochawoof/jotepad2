@@ -144,9 +144,9 @@ class Main {
             viewMenu = propsX.createJMenu("View", "View", new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     if (e.getActionCommand().equals("ViewCharset")) {
-                        if (propsX.get("ViewChange Charset On All").equals("Yes")) {
+                        if (propsX.get("ViewReload All Tabs on Charset Change").equals("Yes")) {
                             for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-                                loadIntoEditor(i);
+                                load(i);
                             }
                         }
                     }
@@ -250,6 +250,8 @@ class Main {
             for (int i = 0; i < tabbedPane.getTabCount(); i++) {
                 theme.apply(((Tab) tabbedPane.getComponentAt(i)).textArea);
             }
+
+            SwingUtilities.updateComponentTreeUI(f);
         } catch (Exception e) {
             e.printStackTrace();
         }

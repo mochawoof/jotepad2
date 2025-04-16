@@ -21,7 +21,7 @@ class PropertiesX {
         props.setProperty("Window Maximized", "No");
         props.setProperty("Last Open Directory", ".");
         setUserChoice("ViewCharset", "US-ASCII", "US-ASCII,ISO-8859-1,UTF-8,UTF-16BE,UTF-16LE,UTF-16");
-        setUserChoice("ViewChange Charset On All", "No", "Yes,No");
+        setUserChoice("ViewReload All Tabs on Charset Change", "No", "Yes,No");
         
         try {
             FileInputStream in = new FileInputStream(file.getPath());

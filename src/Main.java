@@ -36,15 +36,17 @@ class Main {
         }
     };
 
+    // Icon theme
+    public static ImageIcon confirmIcon;
+
     public static void main(String[] args) {
         // Create components
 
         f = new JFrame("Jotepad 2");
-        try {
-            f.setIconImage(new ImageIcon(Main.class.getResource("icon64.png").toURI().toURL()).getImage());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        f.setIconImage(getImageIcon("icon64.png").getImage());
+        confirmIcon = getImageIcon("confirm64.png");
+
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         // Apply saved window size
@@ -122,7 +124,7 @@ class Main {
                 reloadItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK));
                 reloadItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-
+                        load(tabbedPane.getSelectedIndex());
                     }
                 });
                 fileMenu.add(reloadItem);
@@ -139,7 +141,13 @@ class Main {
             editMenu = new JMenu("Edit");
             menuBar.add(editMenu);
 
-            viewMenu = propsX.createJMenu("View", "View");
+            viewMenu = propsX.createJMenu("View", "View", new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    if (((JPopupMenu) ((JMenuItem) e.getSource()).getParent()).getLabel().equals("Charset")) {
+
+                    }
+                }
+            });
             menuBar.add(viewMenu);
 
             pluginsMenu = new JMenu("Plugins");
@@ -174,6 +182,19 @@ class Main {
         updateAll();
         
         f.setVisible(true);
+    }
+
+    public static boolean confirm(String message) {
+        return JOptionPane.showConfirmDialog(f, message, "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, confirmIcon) == JOptionPane.YES_OPTION;
+    }
+
+    public static ImageIcon getImageIcon(String url) {
+        try {
+            return new ImageIcon(Main.class.getResource(url).toURI().toURL());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static void updateAll() {
@@ -234,8 +255,8 @@ class Main {
         Tab tab = new Tab();
         tabbedPane.add("New", tab);
 
-        updateEditorThemes();
         tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
+        updateEditorThemes();
         return tab;
     }
 

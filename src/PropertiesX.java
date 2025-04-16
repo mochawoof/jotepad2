@@ -21,6 +21,7 @@ class PropertiesX {
         props.setProperty("Window Maximized", "No");
         props.setProperty("Last Open Directory", ".");
         setUserChoice("ViewCharset", "US-ASCII", "US-ASCII,ISO-8859-1,UTF-8,UTF-16BE,UTF-16LE,UTF-16");
+        setUserChoice("ViewReload All When Charset Changes", "No", "Yes,No");
         
         try {
             FileInputStream in = new FileInputStream(file.getPath());
@@ -59,7 +60,7 @@ class PropertiesX {
         }
     }
 
-    public JMenu createJMenu(String title, String prefix) {
+    public JMenu createJMenu(String title, String prefix, ActionListener customListener) {
         JMenu menu = new JMenu(title);
         for (Map.Entry<String, String> e : userChoices.entrySet()) {
             String key = e.getKey();
@@ -81,6 +82,11 @@ class PropertiesX {
                             update();
                         }
                     });
+                    
+                    if (customListener != null) {
+                        item.addActionListener(customListener);
+                    }
+
                     menu.add(item);
                 } else {
                     JMenu subMenu = new JMenu(keySubbed);
@@ -104,6 +110,11 @@ class PropertiesX {
                                 update();
                             }
                         });
+
+                        if (customListener != null) {
+                            item.addActionListener(customListener);
+                        }
+
                         subMenu.add(item);
                     }
                     menu.add(subMenu);

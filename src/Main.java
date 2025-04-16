@@ -10,10 +10,14 @@ import java.net.URI;
 import org.fife.ui.rsyntaxtextarea.*;
 import org.fife.ui.rtextarea.*;
 
+import org.fife.rsta.ui.search.*;
+
 class Main {
     public static JFrame f;
     public static JTabbedPane tabbedPane;
     public static JMenuBar menuBar;
+    public static FindToolBar findBar;
+    public static ReplaceToolBar replaceBar;
         public static JMenu fileMenu;
             public static JMenuItem newItem;
             public static JMenuItem openItem;
@@ -22,6 +26,8 @@ class Main {
             public static JMenuItem reloadItem;
             public static JMenuItem closeItem;
         public static JMenu editMenu;
+            public static JMenuItem findItem;
+            public static JMenuItem replaceItem;
         public static JMenu viewMenu;
         public static JMenu pluginsMenu;
             public static JMenuItem noneAvailableItem;
@@ -29,7 +35,7 @@ class Main {
             public static JMenuItem onlineHelpItem;
             public static JMenuItem aboutItem;
 
-    public static final String version = "2.3.1";
+    public static final String version = "2.3.2";
     public static PropertiesX propsX = new PropertiesX() {
         public void update() {
             updateAll();
@@ -78,7 +84,39 @@ class Main {
         });
         
         tabbedPane = new JTabbedPane();
+        tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         f.add(tabbedPane, BorderLayout.CENTER);
+
+        SearchListener searchListener = new SearchListener() {
+            public void searchEvent(SearchEvent e) {
+                SearchEvent.Type type = e.getType();
+                SearchContext context = e.getSearchContext();
+                Tab tab = getSelectedTab();
+
+                if (tab != null) {
+                    if (type == SearchEvent.Type.MARK_ALL) {
+                        SearchEngine.markAll(tab.textArea, context);
+                    } else if (type == SearchEvent.Type.FIND) {
+                        SearchEngine.find(tab.textArea, context);
+                    } else if (type == SearchEvent.Type.REPLACE) {
+                        SearchEngine.replace(tab.textArea, context);
+                    } else if (type == SearchEvent.Type.REPLACE_ALL) {
+                        SearchEngine.replaceAll(tab.textArea, context);
+                    }
+                }
+            }
+
+            public String getSelectedText() {
+                Tab tab = getSelectedTab();
+                if (tab != null) {
+                    return tab.textArea.getSelectedText();
+                }
+                return "";
+            }
+        };
+
+        findBar = new FindToolBar(searchListener);
+        replaceBar = new ReplaceToolBar(searchListener);
 
         // Menu bar
         menuBar = new JMenuBar();
@@ -105,7 +143,7 @@ class Main {
                 saveItem = new JMenuItem("Save");
                 saveItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        save(tabbedPane.getSelectedIndex(), ((Tab) tabbedPane.getSelectedComponent()).file);
+                        save(tabbedPane.getSelectedIndex(), (getSelectedTab()).file);
                     }
                 });
                 saveItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
@@ -131,13 +169,34 @@ class Main {
                 closeItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK));
                 closeItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        close();
+                        closeCurrent();
                     }
                 });
                 fileMenu.add(closeItem);
 
             editMenu = new JMenu("Edit");
             menuBar.add(editMenu);
+                findItem = new JMenuItem("Find");
+                findItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, KeyEvent.CTRL_DOWN_MASK));
+                findItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        removeFindReplace();
+                        f.add(findBar, BorderLayout.PAGE_START);
+                        f.revalidate(); f.repaint();
+                    }
+                });
+                editMenu.add(findItem);
+
+                replaceItem = new JMenuItem("Replace");
+                replaceItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_DOWN_MASK));
+                replaceItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        removeFindReplace();
+                        f.add(replaceBar, BorderLayout.PAGE_START);
+                        f.revalidate(); f.repaint();
+                    }
+                });
+                editMenu.add(replaceItem);
 
             viewMenu = propsX.createJMenu("View", "View", new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -191,6 +250,15 @@ class Main {
         }
 
         f.setVisible(true);
+    }
+
+    public static void removeFindReplace() {
+        f.remove(findBar);
+        f.remove(replaceBar);
+    }
+
+    public static Tab getSelectedTab() {
+        return (Tab) tabbedPane.getSelectedComponent();
     }
 
     public static boolean confirm(String message) {
@@ -266,6 +334,7 @@ class Main {
         Tab tab = new Tab();
         tabbedPane.add("New", tab);
 
+        tabbedPane.setTabComponentAt(tabbedPane.getTabCount() - 1, new ButtonTabComponent(tabbedPane));
         tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
         updateEditorThemes();
         return tab;
@@ -304,6 +373,8 @@ class Main {
         } else {
             tab.textArea.setSyntaxEditingStyle(new SyntaxTypes().SYNTAX_STYLE_NONE);
         }
+
+        SwingUtilities.updateComponentTreeUI(f);
     }
 
     public static void load(int i) {
@@ -358,7 +429,7 @@ class Main {
 
     public static void saveAs() {
         int i = tabbedPane.getSelectedIndex();
-        Tab tab = (Tab) tabbedPane.getSelectedComponent();
+        Tab tab = getSelectedTab();
 
         if (tab != null) {
             DetailsFileChooser chooser = new DetailsFileChooser();
@@ -383,9 +454,13 @@ class Main {
         }
     }
 
-    public static void close() {
+    public static void close(int i) {
         if (tabbedPane.getTabCount() > 1) {
-            tabbedPane.remove(tabbedPane.getSelectedIndex());
+            tabbedPane.remove(i);
         }
+    }
+
+    public static void closeCurrent() {
+        close(tabbedPane.getSelectedIndex());
     }
 }

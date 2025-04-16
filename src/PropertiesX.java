@@ -21,7 +21,7 @@ class PropertiesX {
         props.setProperty("Window Maximized", "No");
         props.setProperty("Last Open Directory", ".");
         setUserChoice("ViewCharset", "US-ASCII", "US-ASCII,ISO-8859-1,UTF-8,UTF-16BE,UTF-16LE,UTF-16");
-        setUserChoice("ViewReload All When Charset Changes", "No", "Yes,No");
+        setUserChoice("ViewChange Charset On All", "No", "Yes,No");
         
         try {
             FileInputStream in = new FileInputStream(file.getPath());
@@ -73,6 +73,7 @@ class PropertiesX {
 
                 if (choices.length == 2 && ((choices[0].equals("Yes") && choices[1].equals("No")) || (choices[0].equals("On") && choices[1].equals("Off")))) {
                     JCheckBoxMenuItem item = new JCheckBoxMenuItem(keySubbed);
+                    item.setActionCommand(key);
                     if (val.equals(choices[0])) {
                         item.setState(true);
                     }
@@ -80,18 +81,20 @@ class PropertiesX {
                         public void actionPerformed(ActionEvent e) {
                             set(key, (item.getState() ? choices[0] : choices[1]));
                             update();
+
+                            // Ensure custom is ran after normal listener
+                            if (customListener != null) {
+                                customListener.actionPerformed(e);
+                            }
                         }
                     });
-                    
-                    if (customListener != null) {
-                        item.addActionListener(customListener);
-                    }
 
                     menu.add(item);
                 } else {
                     JMenu subMenu = new JMenu(keySubbed);
                     for (String c : choices) {
                         JCheckBoxMenuItem item = new JCheckBoxMenuItem(c);
+                        item.setActionCommand(key);
                         if (c.equals(val)) {
                             item.setState(true);
                         }
@@ -108,12 +111,13 @@ class PropertiesX {
                                     }
                                 }
                                 update();
+
+                                // Ensure custom is ran after normal listener
+                                if (customListener != null) {
+                                    customListener.actionPerformed(e);
+                                }
                             }
                         });
-
-                        if (customListener != null) {
-                            item.addActionListener(customListener);
-                        }
 
                         subMenu.add(item);
                     }

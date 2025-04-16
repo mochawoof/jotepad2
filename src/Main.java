@@ -29,7 +29,7 @@ class Main {
             public static JMenuItem onlineHelpItem;
             public static JMenuItem aboutItem;
 
-    public static final String version = "2.3";
+    public static final String version = "2.3.1";
     public static PropertiesX propsX = new PropertiesX() {
         public void update() {
             updateAll();
@@ -143,8 +143,12 @@ class Main {
 
             viewMenu = propsX.createJMenu("View", "View", new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    if (((JPopupMenu) ((JMenuItem) e.getSource()).getParent()).getLabel().equals("Charset")) {
-
+                    if (e.getActionCommand().equals("ViewCharset")) {
+                        if (propsX.get("ViewChange Charset On All").equals("Yes")) {
+                            for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+                                loadIntoEditor(i);
+                            }
+                        }
                     }
                 }
             });
@@ -312,7 +316,9 @@ class Main {
     public static void loadIntoEditor(int i) {
         try {
             Tab tab = (Tab) tabbedPane.getComponentAt(i);
-            tab.textArea.setText(new String(tab.bytes, propsX.get("ViewCharset")));
+            if (tab.file != null) {
+                tab.textArea.setText(new String(tab.bytes, propsX.get("ViewCharset")));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

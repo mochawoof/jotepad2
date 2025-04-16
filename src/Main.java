@@ -80,8 +80,6 @@ class Main {
         tabbedPane = new JTabbedPane();
         f.add(tabbedPane, BorderLayout.CENTER);
 
-        newTab();
-
         // Menu bar
         menuBar = new JMenuBar();
         f.setJMenuBar(menuBar);
@@ -185,6 +183,13 @@ class Main {
 
         updateAll();
         
+        // Open provided file
+        if (args.length > 0) {
+            open(new File(args[0]));
+        } else {
+            newTab();
+        }
+
         f.setVisible(true);
     }
 

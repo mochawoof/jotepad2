@@ -8,6 +8,7 @@ import org.fife.ui.rtextarea.*;
 class Tab extends JPanel {
     public RSyntaxTextArea textArea;
     public File file = null;
+    public byte[] bytes;
 
     public Tab() {
         setLayout(new BorderLayout());

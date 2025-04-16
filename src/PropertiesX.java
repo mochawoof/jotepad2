@@ -20,7 +20,8 @@ class PropertiesX {
         props.setProperty("Window Size", "600x400");
         props.setProperty("Window Maximized", "No");
         props.setProperty("Last Open Directory", ".");
-
+        setUserChoice("ViewCharset", "US-ASCII", "US-ASCII,ISO-8859-1,UTF-8,UTF-16BE,UTF-16LE,UTF-16");
+        
         try {
             FileInputStream in = new FileInputStream(file.getPath());
             props.load(in);

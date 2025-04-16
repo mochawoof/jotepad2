@@ -19,6 +19,7 @@ class Main {
             public static JMenuItem openItem;
             public static JMenuItem saveItem;
             public static JMenuItem saveAsItem;
+            public static JMenuItem reloadItem;
             public static JMenuItem closeItem;
         public static JMenu editMenu;
         public static JMenu viewMenu;
@@ -77,7 +78,7 @@ class Main {
         tabbedPane = new JTabbedPane();
         f.add(tabbedPane, BorderLayout.CENTER);
 
-            tabbedPane.addTab("New", new Tab());
+        newTab();
 
         // Menu bar
         menuBar = new JMenuBar();
@@ -110,13 +111,21 @@ class Main {
                 saveItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
                 fileMenu.add(saveItem);
                 saveAsItem = new JMenuItem("Save As");
+                saveAsItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK));
                 saveAsItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         saveAs();
                     }
                 });
-                saveAsItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK));
                 fileMenu.add(saveAsItem);
+                reloadItem = new JMenuItem("Reload");
+                reloadItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK));
+                reloadItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+
+                    }
+                });
+                fileMenu.add(reloadItem);
                 fileMenu.addSeparator();
                 closeItem = new JMenuItem("Close");
                 closeItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK));
@@ -224,9 +233,9 @@ class Main {
     public static Tab newTab() {
         Tab tab = new Tab();
         tabbedPane.add("New", tab);
-        tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
 
         updateEditorThemes();
+        tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
         return tab;
     }
 
@@ -271,10 +280,20 @@ class Main {
         if (tab.file != null) {
             try {
                 updateTitle(i);
-                tab.textArea.setText(new String(Files.readAllBytes(tab.file.toPath())));
+                tab.bytes = Files.readAllBytes(tab.file.toPath());
+                loadIntoEditor(i);
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public static void loadIntoEditor(int i) {
+        try {
+            Tab tab = (Tab) tabbedPane.getComponentAt(i);
+            tab.textArea.setText(new String(tab.bytes, propsX.get("ViewCharset")));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

@@ -348,7 +348,7 @@ class Main {
         Tab tab = (Tab) tabbedPane.getSelectedComponent();
 
         if (tab != null) {
-            JFileChooser chooser = new JFileChooser();
+            DetailsFileChooser chooser = new DetailsFileChooser();
             chooser.setCurrentDirectory(new File(propsX.get("Last Open Directory")));
             if (tab.file != null) {
                 chooser.setCurrentDirectory(tab.file.getParentFile());
@@ -361,7 +361,7 @@ class Main {
     }
 
     public static void openAs() {
-        JFileChooser chooser = new JFileChooser();
+        DetailsFileChooser chooser = new DetailsFileChooser();
         chooser.setCurrentDirectory(new File(propsX.get("Last Open Directory")));
 
         if (chooser.showOpenDialog(f) == JFileChooser.APPROVE_OPTION) {

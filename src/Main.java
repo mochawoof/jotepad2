@@ -115,8 +115,16 @@ class Main {
             }
         };
 
+        XButton findXButton = new XButton() {
+            public void actionPerformed(ActionEvent e) {
+                removeFindReplace();
+            }
+        };
+
         findBar = new FindToolBar(searchListener);
+        findBar.add(findXButton, BorderLayout.LINE_START);
         replaceBar = new ReplaceToolBar(searchListener);
+        replaceBar.add(findXButton, BorderLayout.LINE_START);
 
         // Menu bar
         menuBar = new JMenuBar();
@@ -181,8 +189,7 @@ class Main {
                 findItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         removeFindReplace();
-                        f.add(findBar, BorderLayout.PAGE_START);
-                        f.revalidate(); f.repaint();
+                        addFindBar();
                     }
                 });
                 editMenu.add(findItem);
@@ -192,8 +199,7 @@ class Main {
                 replaceItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         removeFindReplace();
-                        f.add(replaceBar, BorderLayout.PAGE_START);
-                        f.revalidate(); f.repaint();
+                        addReplaceBar();
                     }
                 });
                 editMenu.add(replaceItem);
@@ -252,9 +258,22 @@ class Main {
         f.setVisible(true);
     }
 
+    public static void addReplaceBar() {
+        f.add(replaceBar, BorderLayout.PAGE_START);
+        SwingUtilities.updateComponentTreeUI(replaceBar);
+        f.revalidate(); f.repaint();
+    }
+
+    public static void addFindBar() {
+        f.add(findBar, BorderLayout.PAGE_START);
+        SwingUtilities.updateComponentTreeUI(findBar);
+        f.revalidate(); f.repaint();
+    }
+
     public static void removeFindReplace() {
         f.remove(findBar);
         f.remove(replaceBar);
+        f.revalidate(); f.repaint();
     }
 
     public static Tab getSelectedTab() {

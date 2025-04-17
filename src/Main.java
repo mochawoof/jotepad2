@@ -87,45 +87,6 @@ class Main {
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         f.add(tabbedPane, BorderLayout.CENTER);
 
-        SearchListener searchListener = new SearchListener() {
-            public void searchEvent(SearchEvent e) {
-                SearchEvent.Type type = e.getType();
-                SearchContext context = e.getSearchContext();
-                Tab tab = getSelectedTab();
-
-                if (tab != null) {
-                    if (type == SearchEvent.Type.MARK_ALL) {
-                        SearchEngine.markAll(tab.textArea, context);
-                    } else if (type == SearchEvent.Type.FIND) {
-                        SearchEngine.find(tab.textArea, context);
-                    } else if (type == SearchEvent.Type.REPLACE) {
-                        SearchEngine.replace(tab.textArea, context);
-                    } else if (type == SearchEvent.Type.REPLACE_ALL) {
-                        SearchEngine.replaceAll(tab.textArea, context);
-                    }
-                }
-            }
-
-            public String getSelectedText() {
-                Tab tab = getSelectedTab();
-                if (tab != null) {
-                    return tab.textArea.getSelectedText();
-                }
-                return "";
-            }
-        };
-
-        XButton findXButton = new XButton() {
-            public void actionPerformed(ActionEvent e) {
-                removeFindReplace();
-            }
-        };
-
-        findBar = new FindToolBar(searchListener);
-        findBar.add(findXButton, BorderLayout.LINE_START);
-        replaceBar = new ReplaceToolBar(searchListener);
-        replaceBar.add(findXButton, BorderLayout.LINE_START);
-
         // Menu bar
         menuBar = new JMenuBar();
         f.setJMenuBar(menuBar);
@@ -188,8 +149,7 @@ class Main {
                 findItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, KeyEvent.CTRL_DOWN_MASK));
                 findItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        removeFindReplace();
-                        addFindBar();
+                        
                     }
                 });
                 editMenu.add(findItem);
@@ -198,8 +158,7 @@ class Main {
                 replaceItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_DOWN_MASK));
                 replaceItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        removeFindReplace();
-                        addReplaceBar();
+                        
                     }
                 });
                 editMenu.add(replaceItem);
@@ -256,24 +215,6 @@ class Main {
         }
 
         f.setVisible(true);
-    }
-
-    public static void addReplaceBar() {
-        f.add(replaceBar, BorderLayout.PAGE_START);
-        SwingUtilities.updateComponentTreeUI(replaceBar);
-        f.revalidate(); f.repaint();
-    }
-
-    public static void addFindBar() {
-        f.add(findBar, BorderLayout.PAGE_START);
-        SwingUtilities.updateComponentTreeUI(findBar);
-        f.revalidate(); f.repaint();
-    }
-
-    public static void removeFindReplace() {
-        f.remove(findBar);
-        f.remove(replaceBar);
-        f.revalidate(); f.repaint();
     }
 
     public static Tab getSelectedTab() {

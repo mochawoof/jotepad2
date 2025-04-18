@@ -41,6 +41,7 @@ class Main {
         public static JMenu editMenu;
             public static JMenuItem findItem;
         public static JMenu viewMenu;
+            public static JMenuItem editAllPropertiesItem;
         public static JMenu pluginsMenu;
             public static JMenuItem noneAvailableItem;
         public static JMenu helpMenu;
@@ -243,6 +244,15 @@ class Main {
                     }
                 }
             });
+                viewMenu.addSeparator();
+
+                editAllPropertiesItem = new JMenuItem("Edit All Properties");
+                editAllPropertiesItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        open(propsX.file);
+                    }
+                });
+                viewMenu.add(editAllPropertiesItem);
             menuBar.add(viewMenu);
 
             pluginsMenu = new JMenu("Plugins");
@@ -329,6 +339,8 @@ class Main {
                 UIManager.setLookAndFeel("com.formdev.flatlaf.FlatLightLaf");
             } else if (laf.equals("FlatDarkLaf")) {
                 UIManager.setLookAndFeel("com.formdev.flatlaf.FlatDarkLaf");
+            } else if (laf.equals("Tiny")) {
+                UIManager.setLookAndFeel("net.sf.tinylaf.TinyLookAndFeel");
             } else {
                 // Look in installed lafs
                 boolean lafNameFound = false;

@@ -8,14 +8,14 @@ class PropertiesX {
     public Properties props;
     public File file = new File("jotepad2.properties");
     public HashMap<String, String> userChoices;
-    public String outNote = "Jotepad2 properties";
+    public String outNote = "Jotepad 2 Properties";
     
     public PropertiesX() {
         props = new Properties();
         userChoices = new HashMap<String, String>();
         
         props.setProperty("Version", Main.version);
-        setUserChoice("ViewTheme", "Cross-Platform", "Cross-Platform,System,Nimbus,CDE/Motif,FlatLightLaf,FlatDarkLaf");
+        setUserChoice("ViewTheme", "Cross-Platform", "Cross-Platform,System,Nimbus,CDE/Motif,FlatLightLaf,FlatDarkLaf,Tiny");
         setUserChoice("ViewEditor Theme", "Default", "Default,Default-Alt,Dark,Druid,Eclipse,Idea,Monokai,VS");
         props.setProperty("Window Size", "800x400");
         props.setProperty("Window Maximized", "No");

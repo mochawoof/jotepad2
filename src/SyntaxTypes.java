@@ -310,7 +310,7 @@ class SyntaxTypes {
     /**
      * Style for highlighting Visual Basic.
      */
-    String SYNTAX_STYLE_VISUAL_BASIC    = "text/vb;vb";
+    String SYNTAX_STYLE_VISUAL_BASIC    = "text/vb;vb,vbs";
 
 
     /**

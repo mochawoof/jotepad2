@@ -17,11 +17,13 @@ class PropertiesX {
         props.setProperty("Version", Main.version);
         setUserChoice("ViewTheme", "Cross-Platform", "Cross-Platform,System,Nimbus,CDE/Motif,FlatLightLaf,FlatDarkLaf");
         setUserChoice("ViewEditor Theme", "Default", "Default,Default-Alt,Dark,Druid,Eclipse,Idea,Monokai,VS");
-        props.setProperty("Window Size", "600x400");
+        props.setProperty("Window Size", "800x400");
         props.setProperty("Window Maximized", "No");
         props.setProperty("Last Open Directory", ".");
         setUserChoice("ViewCharset", "US-ASCII", "US-ASCII,ISO-8859-1,UTF-8,UTF-16BE,UTF-16LE,UTF-16");
         setUserChoice("ViewReload All Tabs on Charset Change", "No", "Yes,No");
+        
+        setUserChoice("FileSave Session", "No", "Yes,No");
         
         try {
             FileInputStream in = new FileInputStream(file.getPath());
@@ -51,13 +53,18 @@ class PropertiesX {
     }
 
     public void save() {
-        try {
-            FileOutputStream out = new FileOutputStream(file.getPath());
-            props.store(out, outNote);
-            out.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // Save on new thread to prevent blocking on slow disks
+        new Thread() {
+            public void run() {
+                try {
+                    FileOutputStream out = new FileOutputStream(file.getPath());
+                    props.store(out, outNote);
+                    out.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
     }
 
     public JMenu createJMenu(String title, String prefix, ActionListener customListener) {

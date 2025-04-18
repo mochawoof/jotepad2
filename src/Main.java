@@ -10,14 +10,27 @@ import java.net.URI;
 import org.fife.ui.rsyntaxtextarea.*;
 import org.fife.ui.rtextarea.*;
 
-import org.fife.rsta.ui.search.*;
-
 class Main {
     public static JFrame f;
     public static JTabbedPane tabbedPane;
+    
+    public static JPanel findReplacePanel;
+    public static JPanel findPanel;
+        public static PlaceholderTextField findField;
+        public static JButton findNextButton;
+        public static JButton findPrevButton;
+
+        public static JCheckBox findMatchCase;
+        public static JCheckBox findRegex;
+        public static JCheckBox findWholeWord;
+
+        public static XButton findXButton;
+    public static JPanel replacePanel;
+        public static PlaceholderTextField replaceField;
+        public static JButton replaceButton;
+        public static JButton replaceAllButton;
+    
     public static JMenuBar menuBar;
-    public static FindToolBar findBar;
-    public static ReplaceToolBar replaceBar;
         public static JMenu fileMenu;
             public static JMenuItem newItem;
             public static JMenuItem openItem;
@@ -27,7 +40,6 @@ class Main {
             public static JMenuItem closeItem;
         public static JMenu editMenu;
             public static JMenuItem findItem;
-            public static JMenuItem replaceItem;
         public static JMenu viewMenu;
         public static JMenu pluginsMenu;
             public static JMenuItem noneAvailableItem;
@@ -56,7 +68,7 @@ class Main {
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         // Apply saved window size
-        f.setSize(600, 400);
+        f.setSize(800, 400);
         try {
             String[] windowSize = propsX.get("Window Size").split("x");
             f.setSize(Integer.parseInt(windowSize[0]), Integer.parseInt(windowSize[1]));
@@ -85,7 +97,70 @@ class Main {
         
         tabbedPane = new JTabbedPane();
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+        tabbedPane.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                closeFind();
+            }
+        });
         f.add(tabbedPane, BorderLayout.CENTER);
+
+        // Find panel
+        findReplacePanel = new JPanel();
+        findReplacePanel.setLayout(new BorderLayout());
+        findReplacePanel.setVisible(false);
+        f.add(findReplacePanel, BorderLayout.PAGE_START);
+
+        findPanel = new JPanel();
+        findPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+
+        findReplacePanel.add(findPanel, BorderLayout.PAGE_START);
+
+            findField = new PlaceholderTextField(20);
+            findField.placeholder = "Find";
+
+            findPanel.add(findField);
+            findNextButton = new JButton("Find Next");
+            findPanel.add(findNextButton);
+            findPrevButton = new JButton("Find Previous");
+            findPanel.add(findPrevButton);
+
+            findMatchCase = new JCheckBox("Match Case");
+            findPanel.add(findMatchCase);
+            findRegex = new JCheckBox("Regex");
+            findPanel.add(findRegex);
+            findWholeWord = new JCheckBox("Whole Word");
+            findPanel.add(findWholeWord);
+
+            findPanel.add(Box.createGlue());
+
+            findXButton = new XButton() {
+                public void actionPerformed(ActionEvent e) {
+                    closeFind();
+                }
+            };
+            findPanel.add(findXButton);
+
+            Action findXAction = new AbstractAction("findXAction") {
+                public void actionPerformed(ActionEvent e) {
+                    findXButton.doClick();
+                }
+            };
+            findXAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
+            findXButton.getActionMap().put("findXAction", findXAction);
+            findXButton.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put((KeyStroke) findXAction.getValue(Action.ACCELERATOR_KEY), "findXAction");
+
+        replacePanel = new JPanel();
+        replacePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        findReplacePanel.add(replacePanel, BorderLayout.PAGE_END);
+
+            replaceField = new PlaceholderTextField(20);
+            replaceField.placeholder = "Replace";
+            replacePanel.add(replaceField);
+
+            replaceButton = new JButton("Replace");
+            replacePanel.add(replaceButton);
+            replaceAllButton = new JButton("Replace All");
+            replacePanel.add(replaceAllButton);
 
         // Menu bar
         menuBar = new JMenuBar();
@@ -142,6 +217,9 @@ class Main {
                     }
                 });
                 fileMenu.add(closeItem);
+                fileMenu.addSeparator();
+
+                fileMenu.add(propsX.createJMenu("File", "File", null).getItem(0));
 
             editMenu = new JMenu("Edit");
             menuBar.add(editMenu);
@@ -149,19 +227,10 @@ class Main {
                 findItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, KeyEvent.CTRL_DOWN_MASK));
                 findItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        
+                        openFind();
                     }
                 });
                 editMenu.add(findItem);
-
-                replaceItem = new JMenuItem("Replace");
-                replaceItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_DOWN_MASK));
-                replaceItem.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        
-                    }
-                });
-                editMenu.add(replaceItem);
 
             viewMenu = propsX.createJMenu("View", "View", new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -215,6 +284,15 @@ class Main {
         }
 
         f.setVisible(true);
+    }
+
+    public static void openFind() {
+        findReplacePanel.setVisible(true);
+        findField.requestFocus();
+    }
+
+    public static void closeFind() {
+        findReplacePanel.setVisible(false);
     }
 
     public static Tab getSelectedTab() {

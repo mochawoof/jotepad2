@@ -7,6 +7,7 @@ class XButton extends JButton implements ActionListener {
     public XButton() {
         int size = 17;
         setPreferredSize(new Dimension(size, size));
+
         setToolTipText("Close");
         //Make the button looks the same for all Laf's
         setUI(new BasicButtonUI());

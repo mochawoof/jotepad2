@@ -313,16 +313,13 @@ class Main {
                     }
                 });
                 helpMenu.add(aboutItem);
-
-        updateAll();
         
-        // Open provided file
         String session = propsX.get("Session");
-
         if (args.length > 0) {
+            // Open provided file
             open(new File(args[0]));
-        }
-        else if (!session.isEmpty()) {
+        } else if (!session.isEmpty()) {
+            // Open session
             String[] files = session.split(",");
             if (files.length > 0) {
                 for (String file : files) {
@@ -336,6 +333,8 @@ class Main {
         } else {
             newTab();
         }
+
+        updateAll();
 
         f.setVisible(true);
     }

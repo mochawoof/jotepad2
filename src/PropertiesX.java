@@ -23,7 +23,8 @@ class PropertiesX {
         setUserChoice("ViewCharset", "US-ASCII", "US-ASCII,ISO-8859-1,UTF-8,UTF-16BE,UTF-16LE,UTF-16");
         setUserChoice("ViewReload All Tabs on Charset Change", "No", "Yes,No");
         
-        setUserChoice("FileSave Session", "No", "Yes,No");
+        setUserChoice("FileSave Session", "Yes", "Yes,No");
+        props.setProperty("Session", "");
         
         try {
             FileInputStream in = new FileInputStream(file.getPath());

@@ -118,11 +118,26 @@ class Main {
 
             findField = new PlaceholderTextField(20);
             findField.placeholder = "Find";
+            findField.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    findNextButton.doClick();
+                }
+            });
 
             findPanel.add(findField);
             findNextButton = new JButton("Find Next");
+            findNextButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    find(FIND);
+                }
+            });
             findPanel.add(findNextButton);
             findPrevButton = new JButton("Find Previous");
+            findPrevButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    find(FIND_PREVIOUS);
+                }
+            });
             findPanel.add(findPrevButton);
 
             findMatchCase = new JCheckBox("Match Case");
@@ -156,11 +171,26 @@ class Main {
 
             replaceField = new PlaceholderTextField(20);
             replaceField.placeholder = "Replace";
+            replaceField.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    replaceButton.doClick();
+                }
+            });
             replacePanel.add(replaceField);
 
             replaceButton = new JButton("Replace");
+            replaceButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    find(REPLACE);
+                }
+            });
             replacePanel.add(replaceButton);
             replaceAllButton = new JButton("Replace All");
+            replaceAllButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    find(REPLACE_ALL);
+                }
+            });
             replacePanel.add(replaceAllButton);
 
         // Menu bar
@@ -287,13 +317,87 @@ class Main {
         updateAll();
         
         // Open provided file
+        String session = propsX.get("Session");
+
         if (args.length > 0) {
             open(new File(args[0]));
+        }
+        else if (!session.isEmpty()) {
+            String[] files = session.split(",");
+            if (files.length > 0) {
+                for (String file : files) {
+                    if (file.equals("con")) {
+                        newTab();
+                    } else {
+                        open(new File(file));
+                    }
+                }
+            }
         } else {
             newTab();
         }
 
         f.setVisible(true);
+    }
+
+    public static void updateSession() {
+        String session = "";
+        if (propsX.get("FileSave Session").equals("Yes")) {
+            for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+                if (!session.isEmpty()) {
+                    session += ",";
+                }
+
+                Tab tab = (Tab) tabbedPane.getComponentAt(i);
+                if (tab.file == null) {
+                    session += "con";
+                } else {
+                    session += tab.file.getAbsolutePath();
+                }
+            }
+        }
+        propsX.set("Session", session);
+    }
+
+    public static final int FIND = 0;
+    public static final int FIND_PREVIOUS = 1;
+    public static final int REPLACE = 2;
+    public static final int REPLACE_ALL = 3;
+
+    public static void find(int mode) {
+        Tab tab = getSelectedTab();
+
+        if (tab != null) {
+            SearchContext context = new SearchContext();
+
+            if (findField.getText().isEmpty()) {
+                return;
+            }
+
+            tab.textArea.clearMarkAllHighlights();
+
+            context.setSearchFor(findField.getText());
+            if (mode == REPLACE || mode == REPLACE_ALL) {
+                context.setReplaceWith(replaceField.getText());
+            }
+
+            context.setSearchWrap(true);
+            context.setMatchCase(findMatchCase.isSelected());
+            context.setRegularExpression(findRegex.isSelected());
+            context.setWholeWord(findWholeWord.isSelected());
+            
+            if (mode == FIND) {
+                context.setSearchForward(true);
+                SearchEngine.find(tab.textArea, context);
+            } else if (mode == FIND_PREVIOUS) {
+                context.setSearchForward(false);
+                SearchEngine.find(tab.textArea, context);
+            } else if (mode == REPLACE) {
+                SearchEngine.replace(tab.textArea, context);
+            } else if (mode == REPLACE_ALL) {
+                SearchEngine.replaceAll(tab.textArea, context);
+            }
+        }
     }
 
     public static void openFind() {
@@ -303,6 +407,11 @@ class Main {
 
     public static void closeFind() {
         findReplacePanel.setVisible(false);
+        
+        Tab tab = getSelectedTab();
+        if (tab != null) {
+            tab.textArea.clearMarkAllHighlights();
+        }
     }
 
     public static Tab getSelectedTab() {
@@ -325,6 +434,7 @@ class Main {
     public static void updateAll() {
         updateLaf();
         updateEditorThemes();
+        updateSession();
     }
 
     public static void updateLaf() {
@@ -386,6 +496,7 @@ class Main {
 
         tabbedPane.setTabComponentAt(tabbedPane.getTabCount() - 1, new ButtonTabComponent(tabbedPane));
         tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
+        updateSession();
         updateEditorThemes();
         return tab;
     }
@@ -433,6 +544,7 @@ class Main {
         if (tab.file != null) {
             try {
                 updateTitle(i);
+                updateSession();
                 tab.bytes = Files.readAllBytes(tab.file.toPath());
                 loadIntoEditor(i);
             } catch (Exception e) {
@@ -465,6 +577,7 @@ class Main {
             try {
                 tab.file = file;
                 updateTitle(i);
+                updateSession();
 
                 FileOutputStream out = new FileOutputStream(file);
                 out.write(tab.textArea.getText().getBytes());
@@ -507,6 +620,7 @@ class Main {
     public static void close(int i) {
         if (tabbedPane.getTabCount() > 1) {
             tabbedPane.remove(i);
+            updateSession();
         }
     }
 

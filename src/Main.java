@@ -48,7 +48,7 @@ class Main {
             public static JMenuItem onlineHelpItem;
             public static JMenuItem aboutItem;
 
-    public static final String version = "2.3.2";
+    public static final String version = "2.3.3";
     public static PropertiesX propsX = new PropertiesX() {
         public void update() {
             updateAll();
@@ -452,6 +452,16 @@ class Main {
                 UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
             } else if (laf.equals("System")) {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
+                // System laf not set
+                if (UIManager.getSystemLookAndFeelClassName().equals(UIManager.getCrossPlatformLookAndFeelClassName())) {
+                    for (UIManager.LookAndFeelInfo lafInfo : UIManager.getInstalledLookAndFeels()) {
+                        if (lafInfo.getName().equals("GTK+")) {
+                            UIManager.setLookAndFeel(lafInfo.getClassName());
+                            break;
+                        }
+                    }
+                }
             } else if (laf.equals("FlatLightLaf")) {
                 UIManager.setLookAndFeel("com.formdev.flatlaf.FlatLightLaf");
             } else if (laf.equals("FlatDarkLaf")) {

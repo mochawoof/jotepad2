@@ -336,6 +336,14 @@ class Main {
 
         updateAll();
 
+        // Print lafs
+        System.out.println("Cross-Platform: " + UIManager.getCrossPlatformLookAndFeelClassName());
+        System.out.println("System: " + UIManager.getSystemLookAndFeelClassName());
+        System.out.println("Installed:");
+        for (UIManager.LookAndFeelInfo lafInfo : UIManager.getInstalledLookAndFeels()) {
+            System.out.println(lafInfo.getName() + ": " + lafInfo.getClassName());
+        }
+
         f.setVisible(true);
     }
 
